@@ -6,7 +6,8 @@ Vue.use(Vuex)
 export default new Vuex.Store({
   state: {
     userInfo:{},//全局用户信息
-    localTrajectroy:[]
+    localTrajectroy:[],//具体轨迹详情
+    TrajectroyList:[],//轨迹列表
   },
   mutations: {
     setuserInfo(state,val){
@@ -14,6 +15,10 @@ export default new Vuex.Store({
     },
     setlocalTrajectroy(state,val){
       state.localTrajectroy = val
+    },
+
+    setTrajectroyList(state,val){
+      state.TrajectroyList = val
     }
   },
   actions: {

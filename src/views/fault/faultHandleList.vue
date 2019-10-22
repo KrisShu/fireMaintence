@@ -30,8 +30,8 @@
   }
 </style>
 <template>
-  <div id="faultHandleList">
-   <base-list @pathTo="goToDetails" :finished="finished" @onLoad="GetBreakDownlist"  :tableList="list" >
+  <div id="faultHandleList" >
+   <base-list @pathTo="goToDetails" @refresh="GetBreakDownlist" :finished="finished" @onLoad="GetBreakDownlist"  :tableList="list" >
     <div slot="content" slot-scope="scope">
       <div class="source_way">
         <span class="source">
@@ -47,7 +47,9 @@
          物联终端
         </span>
       </div>
-      <p class="time">发现时间：<span>{{scope.item.solutionTime}}</span></p>
+      <p v-if="active == 0" class="time">发现时间：<span>{{scope.item.creationTime}}</span></p>
+      <p v-if="active == 1" class="time">解决时间：<span>{{scope.item.solutionTime}}</span></p>
+      <p v-if="active == 2" class="time">解决时间：<span>{{scope.item.solutionTime}}</span></p>
     </div>
    </base-list>
   </div>
@@ -67,7 +69,8 @@ export default {
         FireUnitId: + localStorage.getItem('fireUnitId'),
         HandleStatus: this.active + 1,
         total: 0,
-        SkipCount:0
+        SkipCount:0,
+        MaxResultCount:10,
       },
       list:[],
       finished:false,
@@ -80,7 +83,7 @@ export default {
   },
   created(){
 
-    this.GetBreakDownlist('one');
+    // this.GetBreakDownlist('one');
   },
 
   methods:{
@@ -111,98 +114,47 @@ export default {
      
     },
     GetBreakDownlist(a){
-      console.log("a",a)
       let p = this.page;
       console.log("p",p)
 
       if (a == 'onLoad') {
-        console.log("aaaaaaaaaaaaaaaaaaaaaaaaaa")
-        this.count++
-        // p.SkipCount =  this.count *10
-         p.SkipCount =  this.list.length
+        p.SkipCount =  this.list.length
         console.log(" p.SkipCount ", p.SkipCount )
         this.$axios.get(this.$api.GetBreakDownlist,{
           params:p
         }).then(res=>{
-           console.log("this.list2", this.list)
+           console.log("this.list2",res)
           this.list = this.list.concat(res.data.result.breakDownList)
-          if (res.data.result.breakDownList.length<10) {
-            console.log("没有数据了")
+          if (res.data.result.breakDownList.length<3) {
+            console.log("没有数据了",res.data.result.breakDownList.length)
             this.finished = true
           }
         }).catch(err=>{
           console.log("设施故障列表",err)
         })
-      }else if(a =='one'){
+      }else if (a == 'refresh') {
+        console.log("下拉刷新")
+
+         this.finished = false
          p.SkipCount = 0
-        console.log("bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb", p.SkipCount)
-        this.$axios.get(this.$api.GetBreakDownlist,{
+         this.list =[]
+
+         this.$axios.get(this.$api.GetBreakDownlist,{
           params:p
         }).then(res=>{
-          console.log("设施故障列表",res)
+           console.log("this.list2",res)
           this.list = this.list.concat(res.data.result.breakDownList)
-          console.log("this.list", this.list) 
-          if (res.data.result.breakDownList.length<10) {
+          if (res.data.result.breakDownList.length<2) {
+            console.log("没有数据了",res.data.result.breakDownList.length)
             this.finished = true
           }
         }).catch(err=>{
           console.log("设施故障列表",err)
         })
 
-
       }
-      // if (a== 'onload') {
-      //   console.log("打印onload的数据")
-      //     p.SkipCount = this.list.length
-      //     console.log("打印onload的数据",p)
-      //     this.$axios.get(this.$api.GetBreakDownlist,{
-      //       params:p
-      //     }).then(res=>{
-      //       this.list = this.list.concat(res.data.result.breakDownList) 
-      //       if (res.data.result.breakDownList.length<10) {
-      //         this.finished = false
-      //       }
-      //     }).catch(err=>{
-      //       console.log("设施故障列表",err)
-      //     })
-      // }
-      // else{
-      //    console.log("aaaaaaaa")
-      //  this.$axios.get(this.$api.GetBreakDownlist,{
-      //     params:p
-      //   }).then(res=>{
-      //     this.list = this.list.concat(res.data.result.breakDownList) 
-      //     if (res.data.result.breakDownList.length<10) {
-      //       this.finished = false
-      //     }
-      //   }).catch(err=>{
-      //     console.log("设施故障列表",err)
-      //   })
-      // }
       
-    }
-     /* 获取故障列表 */
-    // GetBreakDownlist(success){
-    //   // console.log("触发事件",success)
-    //   let x = arguments[0] instanceof Object;
-    //   //  console.log("触发事件",arguments[0].SkipCount)
-    //    if (!x) {
-    //     p.SkipCount = 0;
-    //     this.list = [];
-    //   }
-    //   let p = this.page;
-    //   console.log("ppppppppp",p,this.page)
-    //   this.$axios.get(this.$api.GetBreakDownlist,{
-    //     params:p
-    //   }).then(res=>{
-    //      this.list = this.list.concat(res.data.result.breakDownList) 
-    //      p.total = res.data.result.totalCount
-    //      x ? success(this.list.length, res.data.result.totalCount, p) : "";
-
-    //   }).catch(err=>{
-    //     console.log("设施故障列表",err)
-    //   })
-    // },
+    },
     /* 下拉刷新 */
     // refresh(){
     //   this.list =[];

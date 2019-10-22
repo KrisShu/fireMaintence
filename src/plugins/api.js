@@ -12,5 +12,14 @@ const API ={
     GetBreakDownInfo:"/api/services/app/BreakDownService/GetBreakDownInfo",//获取设施故障详情
     UpdateBreakDownInfo:"/api/services/app/BreakDownService/UpdateBreakDownInfo",//更新设施故障详情
 
+    //
+    GetPatrollist:'/api/services/app/DutyAndPatrolService/GetPatrollist',//获取巡查记录列表
+    GetPatrolTrackList:'/api/services/app/DutyAndPatrolService/GetPatrolTrackList',//获取巡查记录轨迹
+    //
+    GetFireUnitlSystem:'/api/services/app/DutyAndPatrolService/GetFireUnitlSystem',//获取防火单位消防系统
+
+    // 
+    GetEquipmentNoList:'/api/services/app/AppGuideSet/GetEquipmentNoList',//获取绑定设施编码列表
+
 }
 export default API

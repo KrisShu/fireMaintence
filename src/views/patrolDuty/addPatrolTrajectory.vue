@@ -2,6 +2,7 @@
   #addPatrolTrajectroyBox{
     display: flex;
     flex-direction: column;
+    height: 100%;
     .addPatrolTrajectroyBox_content{
       flex: 1;
       .bggary{
@@ -93,7 +94,7 @@
         <div class="patrolSystemBox pd28 van-hairline--bottom">
           <p class="left_title">巡查系统</p>
           <van-checkbox-group   v-model="result">
-            <van-checkbox v-for="(arr,index) in checkbox" :key="index" shape="square" :name="arr">复选框 a</van-checkbox>
+            <van-checkbox v-for="(arr,index) in Systems" :key="index" shape="square" :name="arr">{{arr.systemName}}</van-checkbox>
           </van-checkbox-group>
           
         </div>
@@ -101,30 +102,30 @@
       <!--  -->
       <div class="displayflex pd28 van-hairline--bottom">
         <span class="left_title">发现问题</span>
-        <van-switch v-model="checked"/>
+        <van-switch v-model="isfind"/>
       </div>
       <!--  -->
-      <div v-if="checked" class="problemBox van-hairline--bottom">
+      <div v-if="isfind" class="problemBox van-hairline--bottom">
         <div class="displayflex pd28">
           <span class="left_title">问题描述</span>
           <img @click="showrecordText" class="record_textIcon" :src="isRecord ? textIcon  : recodIcon" alt="">
         </div>
-        <baseRecordText :isRecord="isRecord" v-model="recordTexts"></baseRecordText>
+        <baseRecordText @voiceBase64="voiceBase64" :isRecord="isRecord" v-model="recordTexts"></baseRecordText>
         <div class="displayflex pd28 van-hairline--top-bottom">
             <span class="left_title">是否已解决</span>
-            <van-switch v-model="checked"/>
+            <van-switch v-model="issolution"/>
         </div>
       </div>
       <!--  -->
       <div class="pd28">
         <p class="left_title">现场照片：</p>
-        <baseTakePhoto></baseTakePhoto>
+        <baseTakePhoto v-model="takeImgs"></baseTakePhoto>
       </div>
     </div>
     <div class="btns displayflex">
       
-        <van-button type="info"  size="normal">保存并返回</van-button>
-        <van-button class="button2"  size="normal">保存并继续添加</van-button>
+        <van-button type="info" @click="saveBack(0)" size="normal">保存并返回</van-button>
+        <van-button class="button2"  @click="saveBack(1)"  size="normal">保存并继续添加</van-button>
     </div>
     
   </div>
@@ -132,6 +133,8 @@
 
 <script>
 import baseSweepCode from '../../components/baseSweepCode'
+import { Toast } from 'vant';
+import { log } from 'util';
 export default {
   components:{
     baseSweepCode
@@ -139,20 +142,109 @@ export default {
   data(){
     return{
       patrolAddress:'',
-      result:['a'],
-      checkbox:['a','b','c','d'],
+      result:[],
+      Systems:[],
       isnormal:false,
-      checked:true,
+      isfind:false,
+      issolution:false,
       recodIcon:require("../../assets/imgs/zbxc_btn_yuyin.png"),
       textIcon:require("../../assets/imgs/zbxc_btn_jianpan.png"),
       isRecord:false,
-      recordTexts:{}
+      recordTexts:{},
+      voiceFile:'',//
+      takeImgs:[],//现场照片
     }
   },
+  created(){
+    this.getSystems();
+  },
   methods:{
+    /* 接收base64格式的语音文件 */
+    voiceBase64(voiceBase64){
+      this.voiceFile =  this.base64TOfile(voiceBase64,recordTexts.text)
+    },
     showrecordText(){
       this.isRecord = !this.isRecord
-    }
+    },
+    getSystems(){
+      this.$axios.get(this.$api.GetFireUnitlSystem,{
+        params:{
+          FireUnitId :+ localStorage.getItem('fireUnitId'),
+        }
+      }).then(res=>{
+        console.log("获取巡查系统",res)
+        this.Systems = res.data.result
+      }).catch(err=>{
+        console.log("获取巡查系统失败",err)
+      })
+    },
+    saveBack(flag){
+       console.log("this.takeImgs",this.takeImgs,this.recordTexts.text)
+      console.log("flag",flag)
+      if (this.patrolAddress) {
+        let val ={  }
+        val.patrolAddress = this.patrolAddress;//巡查地址
+        val.systems =  this.result;//巡查系统
+        //巡查系统的id
+        let systemid = [];
+        for(let arr of  this.result){
+          systemid.push(arr.fireSystemId)
+        }
+        val.systemid = systemid.join(",")
+        val.ProblemStatus = this.isfind ? (this.issolution ? 2:3) :1 ;//巡查结果
+        //ProblemRemarkType----文字还是语音
+        if (this.recordTexts.voice) {//语音
+          val.ProblemRemarkType = 2
+          val.RemarkVioceT = this.recordTexts.voice 
+          //file对象的
+          val.RemarkVioce = this.voiceFile
+        }else{//文字
+            val.ProblemRemarkType = 1
+             val.RemarkVioce = ''
+             val.ProblemRemark = this.recordTexts.text
+        }
+
+        val.creationTime = new Date().toLocaleString();//巡查时间
+        if (this.takeImgs) {
+          console.log("this.takeImgs",this.takeImgs.length)
+          for(let i in this.takeImgs){
+            //base64水印图片转文件对象
+            val.photoListFile.push(this.base64TOfile(this.takeImgs[i]))
+            //正常base64水印图片
+            val.photoList.push(this.takeImgs[i])
+          }
+        }
+       let patrolArray = this.$store.state.TrajectroyList
+         if (!patrolArray) {
+          patrolArray = [];
+        } else {
+          patrolArray = patrolArray;
+        }
+        patrolArray.unshift(val)//
+        this.$store.commit('setTrajectroyList',patrolArray)
+        this.$toast.success("本地保存成功,请尽快提交");
+        flag ? this.$router.go(0): this.$router.back();
+      }else{
+       this.$toast('请填写正确的巡查地点');
+      }
+      // console.log("this.recordTexts.text",this.recordTexts.text)
+    },
+    /* base64转文件 */
+    base64TOfile(base64){
+      let that = this;
+      var arr = base64.split(',');
+      var mime = arr[0].match(/:(.*?);/)[1];
+      var bstr = atob(arr[1]); // 解码base-64编码的数据
+      var n = bstr.length; 
+      var u8arr = new Uint8Array(n);// 无符号整型数组
+      while(n--){
+          u8arr[n] = bstr.charCodeAt(n);
+      }
+      //转换成file对象
+      let filename = new Date().getTime();
+      let filetest = new File([u8arr], filename, {type:mime})
+      return filetest
+    },
   }
 }
 </script>

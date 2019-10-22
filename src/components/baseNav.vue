@@ -44,6 +44,10 @@ export default {
         active:{
             type:String,
             default: ""
+        },
+        PatrolId:{
+            type:Number,
+            default:0
         }
 
     },
@@ -60,7 +64,7 @@ export default {
                         active:this.active
                      }
                  })
-             }else if(this.title == '新增巡查记录' || this.title == '值班记录' || this.title == '巡查记录' || this.title == '新增值班记录'){
+             }else if(this.title == '新增巡查记录'  || this.title == '巡查记录'){
                  console.log("巡查记录",this.active)
                   this.$router.push({
                      path:'/fault/firePatrol',
@@ -68,7 +72,16 @@ export default {
                         active:this.active
                      }
                  })
-             }else{
+             }else if (this.title == '巡查轨迹详情'  ) {
+                  this.$router.push({
+                     path:'/addPatrol',
+                     query:{
+                      add:false,
+                      PatrolId:this.PatrolId
+                     }
+                 })
+             }
+             else{
                  this.$router.back()
                  console.log("直接返回")
              }

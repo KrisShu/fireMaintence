@@ -1,5 +1,6 @@
 <style lang="less">
   #faultHandleBox{
+    height: 100%;
     .van-tabs__line{
       background-color: #039cfe;
     }
@@ -7,7 +8,7 @@
 </style>
 <template>
   <div id="faultHandleBox">
-    <van-tabs  v-model="active" animated swipeable>
+    <van-tabs  v-model="active"  swipeable>
       <van-tab title="待处理">
         <fault-handle-list :active="active"></fault-handle-list>
       </van-tab>

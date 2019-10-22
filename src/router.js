@@ -13,8 +13,6 @@ const facilityCode =()=>import('../src/views/fault/facilityCode.vue')
 const handle =() => import ("../src/views/faultHandle/handle.vue")
 const handling =() => import ("../src/views/faultHandle/handling.vue")
 const handled =() => import ("../src/views/faultHandle/handled.vue")
-const addDuty =() => import ("../src/views/patrolDuty/addDuty.vue")
-const dutyDetails =()=> import ("../src/views/patrolDuty/dutyDetails.vue")
 const addPatrol = ()=>import ("../src/views/patrolDuty/addPatrol.vue")
 const patrolDetails = ()=>import ("../src/views/patrolDuty/patrolDetails.vue")
 const addPatrolTrajectory = ()=>import ("../src/views/patrolDuty/addPatrolTrajectory.vue")
@@ -91,16 +89,6 @@ export default new Router({
       path:'/handled',
       name:'handled',
       component:handled
-    },
-    {
-      path:"/addDuty",
-      name:'addDuty',
-      component:addDuty
-    },
-    {
-      path:"/dutyDetails",
-      name:'dutyDetails',
-      component:dutyDetails
     },
     {
       path:"/addPatrol",

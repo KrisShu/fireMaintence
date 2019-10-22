@@ -1,5 +1,8 @@
 <style lang="less">
 #faultBox {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
   .leftBox {
     display: flex;
     align-items: center;
@@ -14,6 +17,43 @@
     width: 52px;
     height: 50px;
   }
+  .centercontent{
+    border: 2px solid slateblue;
+    flex: 1;
+   
+    position: relative;
+    .van-tabs{
+      height: 100%;
+      .van-tabs__content{
+        height: 100%;
+        .van-tab__pane{
+          height: 100%;
+        }
+        #faultHandleList{
+          height: 100%;
+          #list{
+             height: 100%;
+          }
+          .van-pull-refresh{
+              height: 100%;
+          }
+          .van-pull-refresh__track{
+            height: 100%;
+          }
+          .van-list{
+            height: 100%;
+            // overflow: scroll
+          }
+
+        }
+      }
+    }
+  }
+
+  // .tabbar{
+  //   height: 100px;
+  //   border: 3px solid darkkhaki;
+  // }
 }
 </style>
 <template>
@@ -28,9 +68,12 @@
     </base-nav>
 
     <!--  -->
-    <router-view></router-view>
+    <div class="centercontent van-clearfix">
+      <router-view></router-view>
+    </div>
+   
     <!--  -->
-    <van-tabbar v-model="active">
+    <van-tabbar class="tabbar" v-model="active">
       <van-tabbar-item v-for="(item, index) in tabBars" :key="index" replace :to="item.router">
         <span>{{ item.label }}</span>
         <img slot="icon" slot-scope="props" :src="props.active ? item.active : item.normal" />

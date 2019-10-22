@@ -102,10 +102,10 @@
       <!--  -->
       <div class="problem_describetion pd28 van-hairline--bottom">
         <p class="left_tip">问题描述:</p>
-        <p class="describetion" v-if="BreakDownInfo.problemRemakeType ==1">
+        <p class="describetion" v-if="BreakDownInfo.problemRemakeType == 1">
           A座23楼，发现楼梯拐角处停放有一辆电动车，暂未找到主人
         </p>
-        <base-play-record v-if="BreakDownInfo.problemRemakeType ==2" :recordVoice="BreakDownInfo.remakeText" class="base_play_record" :isEdit='false'></base-play-record>
+        <base-play-record v-if="BreakDownInfo.problemRemakeType == 2" :recordVoice="BreakDownInfo.remakeText" class="base_play_record" :isEdit='false'></base-play-record>
         <base-take-photo :istakePhoto="false" :trueImgs="BreakDownInfo.truephotoList" :Imgs="BreakDownInfo.photoList"></base-take-photo>
       </div>
       <!--  -->
@@ -120,8 +120,7 @@
           <div class="howtoHandle pd20">
             <p class="text">问题处理途径</p>
             <van-radio-group v-model="radio">
-              <van-radio name="1">自行处理</van-radio>
-              <van-radio name="2">维保叫修</van-radio>
+              <van-radio name="1">维保叫修</van-radio>
             </van-radio-group>
           </div>
 
@@ -161,7 +160,7 @@ export default {
   },
   methods:{
     submit(){ 
-      let handleStatus = this.checked ? '2':'1' 
+      let handleStatus = this.checked ? '3':'2' 
    
       let UpdateBreakDownInfo ={
         breakDownId:this.BreakDownId,

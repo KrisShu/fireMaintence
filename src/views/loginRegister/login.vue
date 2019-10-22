@@ -120,6 +120,7 @@ export default {
             }else{
                 this.$axios.post(this.$api.USER_LOGIN,loginFrom).then(res=>{
                    if(res.data.result.success){
+                    localStorage.setItem('userInfo',JSON.stringify(res.data.result))
                     this.$store.commit('setuserInfo',res.data.result)
                        console.log("登录成功",res)
                     this.$router.push({

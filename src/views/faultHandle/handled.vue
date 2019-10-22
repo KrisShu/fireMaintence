@@ -53,42 +53,41 @@
     <!--  -->
       <div class="source pd28 van-hairline--bottom">
         <span class="left_tip">问题来源:</span>
-        <span style="margin-right: 10px;">值班</span>
-        <span>张胜利 (18349900415)</span>
+        <span style="margin-right: 10px;" v-if="BreakDownInfo.source == 1">值班</span>
+        <span style="margin-right: 10px;" v-if="BreakDownInfo.source == 2">巡查</span>
+        <span style="margin-right: 10px;" v-if="BreakDownInfo.source == 3">物联终端</span>
+          <span>{{BreakDownInfo.userName}} ({{BreakDownInfo.phone}})</span>
 
       </div>
       <!--  -->
       <div class="find_time pd28  van-hairline--bottom">
         <span class="left_tip">发现时间:</span>
-        <span>2019-10-12 11:52</span>
+        <span>{{BreakDownInfo.creationTime}}</span>
       </div>
       <!--  -->
       <div class="problem_describetion pd28 van-hairline--bottom">
         <p class="left_tip">问题描述:</p>
-        <p class="describetion">
-          A座23楼，发现楼梯拐角处停放有一辆电动车，暂未找到主人
+       <p class="describetion" v-if="BreakDownInfo.problemRemakeType ==1">
+         {{BreakDownInfo.remakeText}}
         </p>
-        <van-grid class="imgBox" :gutter="20" :column-num="3">
-          <van-grid-item @click="showImg(index)" v-for="(value,index) in testImg" :key="index">
-            <van-image class="img" :src="value.img" />
-          </van-grid-item>
-        </van-grid>
+       <base-play-record v-if="BreakDownInfo.problemRemakeType ==2" :recordVoice="BreakDownInfo.remakeText" class="base_play_record" :isEdit='false'></base-play-record>
+        <base-take-photo :istakePhoto="false" :trueImgs="BreakDownInfo.truephotoList" :Imgs="BreakDownInfo.photoList"></base-take-photo>
       </div>
       <!--  -->
       <div class="solution_time pd28  van-hairline--bottom">
         <span class="left_tip">解决时间:</span>
-        <span>2019-10-12 11:52</span>
+        <span>{{BreakDownInfo.solutionTime}}</span>
       </div>
       <!--  -->
       <div class="solution_way pd28  van-hairline--bottom">
         <span class="left_tip">处理途径:</span>
-        <span>自行处理</span>
+        <span class="left_tip">维保叫修</span>
       </div>
       <!--  -->
       <div class="remark_tips pd28  van-hairline--bottom">
          <span class="left_tip">备注信息:</span>
         <p class="tips">
-          已联系车辆主人处理
+         {{BreakDownInfo.remark}}
         </p>
       </div>
   </div>
@@ -109,8 +108,14 @@ export default {
         {
           img:require('../../assets/imgs/test1.jpg')
         }
-      ]
+      ],
+      BreakDownInfo:[]
     }
+  },
+  created(){
+    this.BreakDownId = this.$route.query.BreakDownId;
+    console.log("处理中", this.BreakDownId)
+    this.GetBreakDownInfo(this.BreakDownId)
   },
   methods:{
     showImg(index){
@@ -122,6 +127,29 @@ export default {
         startPosition: index,
         closeOnPopstate: true
       });
+    },
+    /* 获取信息 */
+    GetBreakDownInfo(BreakDownId){
+       this.$axios.get(this.$api.GetBreakDownInfo,{
+        params:{
+          BreakDownId
+        }
+      }).then(res=>{
+        this.BreakDownInfo =  res.data.result
+        this.BreakDownInfo.photoList =[];
+        this.BreakDownInfo.truephotoList =[];
+        //遍历真实图片
+        for(let arr of  res.data.result.patrolPhotosPath){
+          this.BreakDownInfo.truephotoList.push(`${this.$url}${arr}`)
+        }
+        //便利缩略图
+        for(let arr of  res.data.result.photosBase64){
+          this.BreakDownInfo.photoList.push(`data:image/;base64,${arr}`)
+        }
+          console.log("获取BreakDownId",res)
+      }).catch(err=>{
+         console.log("获取BreakDownId",err)
+      })
     }
   }
 }

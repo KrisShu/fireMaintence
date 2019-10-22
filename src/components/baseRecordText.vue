@@ -34,8 +34,8 @@
         </div>
       <!-- 录制语音 -->
       <div class="pd28 recordBox" v-else>
-        <base-play-record  :recordVoice="recordTexts.voice"></base-play-record>
-        <base-record v-model="recordTexts.voice"></base-record>
+        <base-play-record v-show="recordTexts.voice" v-model="recordTexts.voice"></base-play-record>
+        <base-record @Vocieto="Vocieto" v-model="recordTexts.voice"></base-record>
       </div>
   </div>
 </template>
@@ -57,6 +57,29 @@ export default {
             default(){
                 return false
             }
+        }
+    },
+    methods:{
+        Vocieto(voiceFile){
+            this.Audio2dataURL(voiceFile)
+        },
+        /* 本地文件转base64 */
+        Audio2dataURL(vociePath){
+            let that = this;
+            plus.io.resolveLocalFileSystemURL(vociePath,function(entry){
+                entry.file(function (file){
+                console.log("语音文件对象",file)
+                var fileReader = new plus.io.FileReader();
+                fileReader.onloadend = function(evt) {
+                that.$emit('voiceBase64',evt.target.result) 
+                
+                }
+                fileReader.readAsDataURL( file );
+                });
+                
+            },function(e){
+                alert( "Resolve file URL failed: " + e.message );
+            })
         }
     }
 

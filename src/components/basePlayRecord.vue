@@ -43,6 +43,10 @@
 <script>
 import { Toast } from 'vant';
 export default {
+    model:{
+       prop:'recordVoice',
+       event:"change"  
+    },
     props:{
         recordVoice:String,//声音文件
         isEdit:{
@@ -60,6 +64,7 @@ export default {
     methods:{
         /* 点击播放 */
         palySound(){
+            let that = this;
             this.player = plus.audio.createPlayer(this.recordVoice); //创建音频播放器对象
             let p = this.player;
             p.play(()=> {
@@ -73,8 +78,10 @@ export default {
         },
         /* 删除语音 */
         deleteVoice(){
+            console.log("删除语音")
             this.player.close();
             this.recordVoice = "";
+            this.$emit('change',this.recordVoice)
         }
     }
 }

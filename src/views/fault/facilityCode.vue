@@ -80,7 +80,15 @@ export default {
           code:'GkJ68',
           tips:'消防供配电系统'
         }
-      ]
+      ],
+      params:{
+        
+      }
+    }
+  },
+  methods:{
+    axiosWay(){
+      this.$axios.get(this.$api.GetEquipmentNoList)
     }
   }
 }

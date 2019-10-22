@@ -41,7 +41,6 @@
     <div class="baseTakePhoto">
         <!-- 添加删除照片 -->
         <div class="addphotoBox" v-if="istakePhoto">
-          
             <van-grid class="imgBox"  :border="false" :gutter="20" :column-num="3">
                 <van-grid-item v-if="takeImgs.length<3">
                       <img class="addphoto"   @click="takePhoto" src="../assets/imgs/zbxc_btn_paizhao.png" alt="">
@@ -70,13 +69,7 @@ export default {
         event:'change'
     },
     props:{
-        takeImgs:{
-            type:Array,
-            default(){
-                return [
-                ]
-            }
-        },
+        takeImgs:Array,
         istakePhoto:{
             type:Boolean,
             default(){
@@ -103,7 +96,6 @@ export default {
         }
     },
     mounted(){
-        this.takeImgs.push(this.img)
     },
     methods:{
         takePhoto(){
@@ -144,9 +136,9 @@ export default {
                     //获取拍照后的真实地址
                     plus.io.resolveLocalFileSystemURL(path,function(entry) {
                         console.log("拍照获取的真实路径",entry.fullPath)
-                        that.takeImgs.push(entry.fullPath)
-                        console.log("that.takeImgs",that.takeImgs)
-                        that.$emit('change',that.takeImgs)
+                        var imgSrc = entry.toLocalURL();//
+                        that.getBase64Time(imgSrc)
+                        // that.$emit('change',that.takeImgs)
                     },
                     function(e) {
                         console.log(e.message);
@@ -160,14 +152,58 @@ export default {
         getImg(){
 
         },
+        /* 照片转码成base64加上时间水印 */
+        getBase64Time(url){
+            console.log("调用此方法")
+            let that =this;
+            let canvas = document.createElement("canvas"),
+            ctx = canvas.getContext("2d"),
+            image = new Image();
+            image.crossOrigin = "Anonymous";
+            image.onload = function() {//这里是一个异步，所以获取到的base64文件需要用回调
+                canvas.height = image.height;
+                canvas.width = image.width;
+                ctx.drawImage(image, 0, 0);
+                ctx.font ="200px Arial";
+                ctx.fillStyle = "tomato"; 
+                let time = that.getCurrnetTime("timeSign");//获取当前的时间
+                 console.log("time",time)
+                ctx.textAlign = "end";
+                ctx.textBaseline = "middle";
+                ctx.fillText(time,image.width-20,image.height-100);
+                let dataURL = canvas.toDataURL( "image/png/jpg"); 
+                that.takeImgs.push(dataURL);
+                console.log("组件里的that.takeImgs",that.takeImgs)
+            };
+            image.src = url
+        },
+         //获取当前时间
+        getCurrnetTime(flga){
+            let now = new Date(),
+            year = now.getFullYear(), //得到年份
+            month = now.getMonth()+1,//得到月份
+            date = now.getDate(),//得到日期
+            hour = now.getHours(),//得到小时
+            minu = now.getMinutes(),//得到分钟
+            seconds = now.getSeconds();//得到秒
+
+            month = month<10?'0'+ month : month;
+            date =date<10?'0'+ date : date;
+            hour =hour<10?'0'+ hour : hour;
+            minu = minu<10?'0'+ minu : minu;
+            seconds = seconds<10?'0'+ seconds : seconds;
+            if(flga == 'timeSign'){
+                return year + "-" + month + "-" + date +" "+hour+":"+minu
+            }else if(flga == 'name'){//返回时间戳
+                return now.getTime()
+            }
+            
+        },
         /* 点击展示图片 */
         showImg(index){
             if(this.istakePhoto){
                 const instance = ImagePreview({
-                    images: [
-                    require('../assets/imgs/test1.jpg'),
-                    require('../assets/imgs/test1.jpg'),
-                    ],
+                    images: this.takeImgs,
                     startPosition: index,
                     closeOnPopstate: true 
                 });

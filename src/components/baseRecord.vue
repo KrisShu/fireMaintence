@@ -58,10 +58,12 @@ export default {
                 return
             }
             r.record({ filename: "_doc/audio/" },(recordFile)=>{
+                console.log("录音成功",recordFile)
                 Toast.clear();//关闭蒙层动画
                 //将录取的声音抛给播放播放组件
-                that.$emit("change",recordFile)
-                //还要将语音转化为文件对象
+                that.$emit("change",recordFile)//双向绑定数据
+                //还要将语音转化为文件对象，而抛出的语音本地文件
+                 that.$emit("Vocieto", recordFile);
             },(e)=>{
                  alert("Audio record failed录音失败: " + e);
             })

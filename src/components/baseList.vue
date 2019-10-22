@@ -8,7 +8,7 @@
     align-items: center;
   }
   .van-list{
-    padding-bottom: 100px;
+    // padding-bottom: 100px;
   }
 }
 
@@ -17,7 +17,7 @@
 <template>
   <div id="list">
     <van-pull-refresh v-model="isLoading" @refresh="onRefresh">
-      <van-list :immediate-check="false"  v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
+      <van-list  class="van-clearfix" v-model="loading" :finished="finished" finished-text="没有更多了" @load="onLoad">
         <van-cell @click="pathTo(item)" v-for="(item,index) in tableList" :key="index" :is-link="islink">
           <slot name="content" :item='item'></slot>
         </van-cell>
@@ -64,17 +64,14 @@ export default {
   },
   methods: {
     onLoad() {
-      this.$emit('onLoad','onLoad')
-      this.loading = false
+      setTimeout(() => {
+          this.$emit('onLoad','onLoad')
+          this.loading = false
+          }, 500)
+   
     },
     onRefresh() {
       let that = this;
-    /*   this.$emit("refresh", function refresh(size =0,total=10,page = {}) {
-        page.SkipCount = size;
-        that.loading = false;
-        that.isLoading = false;
-        that.$toast("刷新成功");
-      }); */
       this.$emit("refresh",'refresh')
         that.$toast("刷新成功");
         this.isLoading = false

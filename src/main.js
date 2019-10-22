@@ -21,6 +21,17 @@ Vue.use(Vant)
 Vue.config.productionTip = false
 axios.defaults.baseURL = 'http://fd.sctsjkj.com:5080' //* 线上接口ip地址 
 
+
+
+
+//
+let val = localStorage.getItem("userInfo");
+if(val){
+  let info = JSON.parse(val);
+  store.commit("setuserInfo",info)
+}
+
+
 new Vue({
   router,
   store,
