@@ -112,6 +112,7 @@
 </template>
 
 <script>
+import { Toast } from 'vant';
 export default {
   components:{
   },
@@ -180,12 +181,33 @@ export default {
    },
    /*  */
    gotoAdd(){
+    this.$axios.get(this.$api.GetAddAllow,{
+      params:{
+        FireUnitId:localStorage.getItem('fireUnitId')
+      }
+    }).then(res=>{
+      console.log("是否可以添加",res)
+      if (res.data.result.success) {
+            // this.$router.push({
+            //   path:'/addPatrol',
+            //   query:{
+            //       add :true
+            //   }
+            // })
+      }else{
+         this.$toast(res.data.result.failCause);
+      }
+    }).catch(err=>{
+      console.log(err)
+    })
+
     this.$router.push({
       path:'/addPatrol',
       query:{
           add :true
       }
     })
+
    },
    /*  */
    changedropdown(status){

@@ -70,7 +70,7 @@
             <van-grid-item to="/fireUnitList" @click="menuchange('maintenance')" :class="active? 'active':'unactive'">
                 <div class="slotBox" slot="default">
                     <img class="menuIcon" :src="active ? maintenance2: maintenance1" alt="">
-                    <span>维保事物</span>
+                    <span>维保事务</span>
                 </div>
             </van-grid-item>
             <van-grid-item to="/set"  @click="menuchange('set')" :class="active ?'unactive':'active'">
@@ -93,6 +93,10 @@ export default {
             maintenance1:require('../../assets/imgs/maintenance_1.png'),
             maintenance2:require('../../assets/imgs/maintenance_2.png'),
         }
+    },
+    created(){
+        console.log("this.$route.meta.active",this.$route.meta.active)
+         this.active = this.$route.meta.active
     },
     methods:{
         menuchange(state){

@@ -20,6 +20,21 @@ const API ={
 
     // 
     GetEquipmentNoList:'/api/services/app/AppGuideSet/GetEquipmentNoList',//获取绑定设施编码列表
+    // 添加
+    GetAddAllow:'/api/services/app/DutyAndPatrolService/GetAddAllow',//是否可以添加
+    AddPatrolTrack:'api/services/app/DutyAndPatrolService/AddPatrolTrack',//添加巡查记录
+    AddPatrolTrackDetail:'/api/services/app/DutyAndPatrolService/AddPatrolTrackDetail',//添加巡查记录轨迹
 
+    //设置
+    ChangePassword: "/api/services/app/SafeUnit/ChangePassword", //修改密码
+    Addadvice:'/api/services/app/Version/Add',//添加建议
+    GetAllFireUnitOfSafe:'/api/services/app/SafeUnit/GetAllFireUnitOfSafe',//获取所有
+    AddSafeUserFireUnit:'/api/services/app/SafeUnit/AddSafeUserFireUnit',//新增防火单位
+   //绑定设施编码
+    AddEquipmentNo:'/api/services/app/AppGuideSet/AddEquipmentNo',//绑定设施编码
+    UpdateEquipmentNoInfo:'/api/services/app/AppGuideSet/UpdateEquipmentNoInfo',//修改设施编码
+    DelEquipmentNo:'/api/services/app/AppGuideSet/DelEquipmentNo',//删除
+    //
+    DelSafeUserFireUnit:'/api/services/app/SafeUnit/DelSafeUserFireUnit',//删除维保人员要维保的防火单位
 }
 export default API

@@ -99,7 +99,6 @@ export default {
     },
     methods:{
         takePhoto(){
-            this.$emit('change',this.testdata )
             let that = this;
             let bts = [
                 {
@@ -138,7 +137,7 @@ export default {
                         console.log("拍照获取的真实路径",entry.fullPath)
                         var imgSrc = entry.toLocalURL();//
                         that.getBase64Time(imgSrc)
-                        // that.$emit('change',that.takeImgs)
+                        
                     },
                     function(e) {
                         console.log(e.message);
@@ -173,6 +172,7 @@ export default {
                 ctx.fillText(time,image.width-20,image.height-100);
                 let dataURL = canvas.toDataURL( "image/png/jpg"); 
                 that.takeImgs.push(dataURL);
+                that.$emit('change',that.takeImgs) //双向绑定还是要抛出？这是个疑问
                 console.log("组件里的that.takeImgs",that.takeImgs)
             };
             image.src = url

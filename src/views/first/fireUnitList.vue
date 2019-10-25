@@ -69,7 +69,7 @@ export default {
         return
       }
       console.log("a",a)
-        let p = this.page
+      let p = this.page
       this.$axios.get(this.$api.GetSafeUnitUserEvent,{
         params:p
       }).then(res=>{

@@ -161,7 +161,7 @@ export default {
   methods:{
     /* 接收base64格式的语音文件 */
     voiceBase64(voiceBase64){
-      this.voiceFile =  this.base64TOfile(voiceBase64,recordTexts.text)
+      this.voiceFile =  this.base64TOfile(voiceBase64)
     },
     showrecordText(){
       this.isRecord = !this.isRecord
@@ -179,8 +179,6 @@ export default {
       })
     },
     saveBack(flag){
-       console.log("this.takeImgs",this.takeImgs,this.recordTexts.text)
-      console.log("flag",flag)
       if (this.patrolAddress) {
         let val ={  }
         val.patrolAddress = this.patrolAddress;//巡查地址
@@ -191,11 +189,12 @@ export default {
           systemid.push(arr.fireSystemId)
         }
         val.systemid = systemid.join(",")
-        val.ProblemStatus = this.isfind ? (this.issolution ? 2:3) :1 ;//巡查结果
+        //巡查结果
+        val.ProblemStatus = this.isfind ? (this.issolution ? 2:3) :1 ;
         //ProblemRemarkType----文字还是语音
         if (this.recordTexts.voice) {//语音
           val.ProblemRemarkType = 2
-          val.RemarkVioceT = this.recordTexts.voice 
+          val.RemarkVioceT = this.recordTexts.voice //原路径的
           //file对象的
           val.RemarkVioce = this.voiceFile
         }else{//文字
@@ -203,9 +202,12 @@ export default {
              val.RemarkVioce = ''
              val.ProblemRemark = this.recordTexts.text
         }
-
-        val.creationTime = new Date().toLocaleString();//巡查时间
+        //巡查时间
+        val.creationTime = new Date().toLocaleString();
+        //巡查图片
         if (this.takeImgs) {
+           val.photoListFile =[];
+           val.photoList =[];
           console.log("this.takeImgs",this.takeImgs.length)
           for(let i in this.takeImgs){
             //base64水印图片转文件对象

@@ -73,15 +73,25 @@ export default {
                      }
                  })
              }else if (this.title == '巡查轨迹详情'  ) {
-                  this.$router.push({
-                     path:'/addPatrol',
-                     query:{
-                      add:false,
-                      PatrolId:this.PatrolId
-                     }
-                 })
-             }
-             else{
+                 if (this.PatrolId) {//有则表视为查看
+                    this.$router.push({
+                        path:'/addPatrol',
+                        query:{
+                        add:false,
+                        PatrolId:this.PatrolId
+                        }
+                    })
+                    }else{
+                            console.log("ppppppppppppppppppppppppppppppppp")
+                            this.$router.push({
+                                path:'/addPatrol',
+                                query:{
+                                    add:true,
+                                }
+                            })
+                        }
+                        
+            }else{
                  this.$router.back()
                  console.log("直接返回")
              }

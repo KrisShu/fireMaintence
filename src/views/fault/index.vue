@@ -18,7 +18,6 @@
     height: 50px;
   }
   .centercontent{
-    border: 2px solid slateblue;
     flex: 1;
    
     position: relative;
@@ -89,9 +88,9 @@ export default {
         active:0,
         tabBars: [
             {
-            label: "故障处理",
+            label: "维保叫修",
             active: require("../../assets/imgs/deal1.png"),
-            normal: require("../../assets/imgs/deal2.png"),
+            normal: require("../../assets/imgs/del2.png"),
             router: "faultHandle"
             },
             {
@@ -118,7 +117,8 @@ export default {
   },
   methods: {
     goHome() {
-      this.$router.push("/");
+      console.log("this.$route",this.$route.meta.active)
+      this.$router.push("/fireUnitList");
     }
   }
 };

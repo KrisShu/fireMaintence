@@ -1,7 +1,7 @@
 <style lang="less">
 #addPatrolBox{
   display: flex;
-  // height: 100%;
+  height: 100%;
   flex-direction: column;
   // overflow: scroll;
   .addTrajectory{
@@ -60,9 +60,6 @@
         <patrol-details :PatrolId="PatrolId" :add="isadd"></patrol-details>
       </div>
     <!--  -->
-      <div class="btns" v-if="isadd">
-        <van-button type="info"  size="large">提交</van-button>
-      </div>
   </div>    
 </template>
 
@@ -75,14 +72,14 @@ export default {
   data(){
     return{
       isadd:Boolean,
-      PatrolId:0
+      PatrolId:0,
     }
   },
   created(){
+    console.log("this.$route.query",this.$route.query)
     if(this.$route.query){
      this.$route.query.add ? this.isadd = true :this.isadd = false
-     this.PatrolId =  this.$route.query.PatrolId 
-     
+     this.PatrolId =  this.$route.query.PatrolId
     }
   },
   methods:{
@@ -92,6 +89,7 @@ export default {
       })
     }
   }
+
 }
 </script>
 

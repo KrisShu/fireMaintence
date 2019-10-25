@@ -1,11 +1,14 @@
 <style lang="less">
 #patrolDetailsBox{
+  height: 100%;
   .noData{
     width: 100%;
     display: flex;
     justify-content: center;
+    height: 100%;
     & >img{
-      width: 36px;
+      width: 26px;
+      height: 90%;
       margin-top: 40px;
     }
     .noData_text{
@@ -27,6 +30,12 @@
   }
 
   .dataBox{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    .dataBox_content{
+      flex: 1;
+    }
     .dataBox_title{
       font-size: 26px;
       color: #a0a0a0;
@@ -71,7 +80,7 @@
   
   <div id="patrolDetailsBox">
     <!-- 新增 -->
-    <div v-if="add">
+    <div style="height:100%" v-if="add">
       <!--  -->
       <div v-if="localList.length<=0" class="noData">
         <img src="../../assets/imgs/zbxc_img_03.png" alt="">
@@ -82,7 +91,8 @@
       </div>
       <!--  -->
       <div v-else class="dataBox">
-          <p class="dataBox_title pd28 van-hairline--bottom">
+        <div class="dataBox_content">
+           <p class="dataBox_title pd28 van-hairline--bottom">
             有效轨迹点{{localList.length}}个，发现2个问题，现场解决1个问题
           </p>
           <div class="pd28 re">
@@ -99,7 +109,7 @@
                     <p v-if="val.ProblemRemarkType == 1" class="left_title overflow">
                         {{val.ProblemRemark}}
                     </p>
-                    <base-play-record v-if="val.ProblemRemarkType == 2"></base-play-record>
+                    <base-play-record :isEdit="false" v-if="val.ProblemRemarkType == 2"></base-play-record>
                     <div class="imgs pd20_topBottom" v-if="val.photoList">
                       <van-grid :border="false" :gutter="10" :column-num="3">
                         <van-grid-item v-for="(img,index2) in val.photoList" :key="index2">
@@ -113,6 +123,10 @@
                 </van-step>
                </van-steps>
           </div>
+        </div>
+        <div class="btns" @click="submit">
+          <van-button type="info"  size="large">提交</van-button>
+        </div>
          
       </div>
       <!--  -->
@@ -123,33 +137,33 @@
       <p class="dataBox_title pd28 van-hairline--bottom">
         有效轨迹点{{total}}个，发现2个问题，现场解决1个问题
       </p>
-        <div class="pd28 re">
-              <van-steps  direction="vertical" :active="patrolTrajectroy.length">
-                <van-step v-for="(val,index) in patrolTrajectroy" :key="index">
-                  <div class="step_content "  @click="showTrajectroy(val)">
-                    <p class="displayflex">
-                      <span class="color1">{{val.creationTime}}</span>
-                      <span class="color1" v-if="val.patrolStatus == 1">正常</span>
-                      <span class="color1" v-if="val.patrolStatus == 2">故障</span>
-                      <span class="color1" v-if="val.patrolStatus == 3">故障</span>
-                    </p>
-                    <p class="left_title pd20_topBottom">{{val.fireSystemName}}等{{val.fireSystemNames.length}}个系统</p>
-                    <p v-if="val.problemRemakeType == 1" class="left_title overflow">
-                        {{val.remakeText}}
-                    </p>
-                    <base-play-record v-if="val.problemRemakeType == 2" :isEdit="false"></base-play-record>
-                    <div class="imgs pd20_topBottom">
-                      <van-grid :border="false" :gutter="10" :column-num="3">
-                        <van-grid-item v-for="(img,index2) in val.photoList" :key="index2">
-                          <img class="img" :src="img" alt="">
-                        </van-grid-item>
-                        </van-grid>
-                    </div>
-                    
+      <div class="pd28 re">
+            <van-steps  direction="vertical" :active="patrolTrajectroy.length">
+              <van-step v-for="(val,index) in patrolTrajectroy" :key="index">
+                <div class="step_content "  @click="showTrajectroy(val)">
+                  <p class="displayflex">
+                    <span class="color1">{{val.creationTime}}</span>
+                    <span class="color1" v-if="val.patrolStatus == 1">正常</span>
+                    <span class="color1" v-if="val.patrolStatus == 2">故障</span>
+                    <span class="color1" v-if="val.patrolStatus == 3">故障</span>
+                  </p>
+                  <p class="left_title pd20_topBottom">{{val.fireSystemName}}等{{val.fireSystemNames.length}}个系统</p>
+                  <p v-if="val.problemRemakeType == 1" class="left_title overflow">
+                      {{val.remakeText}}
+                  </p>
+                  <base-play-record v-if="val.problemRemakeType == 2" :isEdit="false"></base-play-record>
+                  <div class="imgs pd20_topBottom">
+                    <van-grid :border="false" :gutter="10" :column-num="3">
+                      <van-grid-item v-for="(img,index2) in val.photoList" :key="index2">
+                        <img class="img" :src="img" alt="">
+                      </van-grid-item>
+                      </van-grid>
                   </div>
-                </van-step>
-               </van-steps>
-          </div>
+                  
+                </div>
+              </van-step>
+            </van-steps>
+      </div>
 
     </div>
     
@@ -157,6 +171,7 @@
 </template>
 
 <script>
+import { Toast } from "vant";
 export default {
   props:{
     add:{
@@ -173,32 +188,11 @@ export default {
   data(){
     return{
       nodata:false,
-      step:[
-        // {
-        //   time:'2019-101-12 11:50',
-        //   status : 0,
-        //   system:"巡查消防",
-        //   text:'栋1单元21楼，发现楼梯拐角处电箱栋1单元21楼，发现楼梯拐角处电箱门',
-        //   img:[require('../../assets/imgs/test1.jpg'),require('../../assets/imgs/test1.jpg'),require('../../assets/imgs/test1.jpg')]
-        // },
-        // {
-        //   time:'2019-101-12 11:50',
-        //   status : 0,
-        //   system:"巡查消防",
-        //   text:'栋1单元21楼，发现楼梯拐角处电箱栋1单元21楼，发现楼梯拐角处电箱门',
-        //   img:[require('../../assets/imgs/test1.jpg')]
-        // },
-        //  {
-        //   time:'2019-101-12 11:50',
-        //   status : 0,
-        //   system:"巡查消防",
-        //   text:'栋1单元21楼，发现楼梯拐角处电箱栋1单元21楼，发现楼梯拐角处电箱门',
-        //   img:[require('../../assets/imgs/test1.jpg')]
-        // }
-      ],
+      step:[],
       total:0,
       patrolTrajectroy:[],//查看
-      localList:[],//本地信息
+      localList:[],//本地信息,
+      add_patrolId:''
     }
   },
   created(){
@@ -211,13 +205,16 @@ export default {
   },
   methods:{
     deleteTrajectroy(index){
-      this.step.splice(index,1)
+      this.localList.splice(index,1)
     },
     showTrajectroy(item){
+      console.log("this.add",this.add)
       this.$store.commit('setlocalTrajectroy',item)
       this.$router.push({
         path:'/patrolTrajectroy',
-        isadd:this.add
+        query:{
+          isadd :this.add
+        }
       })
     },
     /* 查看巡查轨迹 */
@@ -245,6 +242,60 @@ export default {
     getLocal(){
       console.log("this.$store.state.localTrajectroy",this.$store.state.TrajectroyList)
        this.localList = this.$store.state.TrajectroyList
+    },
+    /* 提交 */
+    // 新建一个巡查对象，然后返回ID，再依次添加数据
+    submit(){
+      Toast.loading({
+        duration: 0,
+        mask: true,
+        message: "提交中"
+      });
+      let data={
+        userId :this.$store.state.userInfo.userId,
+        fireUnitId:localStorage.getItem('fireUnitId')
+      }
+      console.log("data",data)
+      this.$axios.post(this.$api.AddPatrolTrack,data).then(res=>{
+        console.log("添加巡查记录",res)
+        if (res.data.success) {
+          this.add_patrolId = res.data.result.patrolId
+          this.submitTrajectroy()
+        }
+
+      }).catch(err=>{
+        console.log("添加巡查记录失败",err)
+      })
+    },
+    /* submit */
+    submitTrajectroy(){
+      let that = this;
+      for(let arr of this.localList){
+           let param = new FormData();
+            param.append("PatrolId",that.add_patrolId)
+            param.append("PatrolAddress",arr.patrolAddress)
+            param.append("SystemIdList",arr.systemid)
+            param.append("ProblemStatus",arr.ProblemStatus)
+            param.append("ProblemRemarkType",arr.ProblemRemarkType)
+            param.append("ProblemRemark",arr.ProblemRemark)
+            param.append("RemarkVioce", arr.RemarkVioce)
+            for (let y in arr.photoListFile){
+               param.append(`LivePicture${Number(y) + 1}`, arr.photoListFile[y]);
+            }
+
+            this.$axios.post(this.$api.AddPatrolTrackDetail,param).then(res => {
+              console.log("添加巡查轨迹反馈",res)
+                  Toast.clear();
+                  that.$toast.success("提交成功");
+                  that.$router.push({
+                    name:'firePatrol'
+                  });
+                  this.$store.commit('setTrajectroyList',[])
+            }).catch(res=>{
+              console.log("上传提交失败",res)
+            })
+
+      }
     }
 
   }

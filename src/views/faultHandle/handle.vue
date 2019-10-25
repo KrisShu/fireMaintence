@@ -103,7 +103,7 @@
       <div class="problem_describetion pd28 van-hairline--bottom">
         <p class="left_tip">问题描述:</p>
         <p class="describetion" v-if="BreakDownInfo.problemRemakeType == 1">
-          A座23楼，发现楼梯拐角处停放有一辆电动车，暂未找到主人
+         {{BreakDownInfo.remakeText}}
         </p>
         <base-play-record v-if="BreakDownInfo.problemRemakeType == 2" :recordVoice="BreakDownInfo.remakeText" class="base_play_record" :isEdit='false'></base-play-record>
         <base-take-photo :istakePhoto="false" :trueImgs="BreakDownInfo.truephotoList" :Imgs="BreakDownInfo.photoList"></base-take-photo>
