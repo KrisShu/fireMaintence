@@ -35,7 +35,7 @@
 </style>
 <template>
   <div id="registerInvationBox">
-    <base-nav title="维保管理员注册"></base-nav>
+    <base-nav title="维保单位员工注册"></base-nav>
     <van-cell-group>
         <van-field v-model="fireUnitName" clearable @keyup="search" placeholder="请输入维保单位名称">
             <img class="left-icon" slot="left-icon" src="../../assets/imgs/load_img_06.png" alt="">
@@ -55,9 +55,6 @@
             </ul>
         </van-popup>
     </div>
-    <p class="tips">
-        管理员拥有全部权限，只能通过邀请码进行注册，请妥善保管邀请码，无对外泄露。
-    </p>
     <div class="btns">
         <van-button  @click="nextStep" type="info" size="large">下一步</van-button>
     </div>
@@ -99,8 +96,8 @@ export default {
                         this.searchList = res.data.result
                     }
                  
-                }).catch(res=>{
-                    console.log("模糊查询失败",res)
+                }).catch(err=>{
+                    console.log("模糊查询失败",err)
                 })
             }
         },
@@ -116,15 +113,29 @@ export default {
                 fireUnitID:this.fireUnitID,
                 invationCode:this.invationCode
             }
-            if(!(this.fireUnitName && this.fireUnitID)){
+            let data = {
+                unitName:this.fireUnitName,
+                invitatCode:this.invationCode
+            }
+            if(!(this.fireUnitName && this.fireUnitID && this.invationCode)){
                this.$toast('请填写正确的维保单位和邀请码');
             }else{
-                this.$router.push({
-                    path:'/register',
-                    query:{
-                        parameter
+                this.$axios.post(this.$api.InvitatVerify,data).then(res=>{
+                    console.log("邀请码验证",res)
+                    if (res.data.result.success) {
+                        this.$router.push({
+                            path:'/register',
+                            query:{
+                                parameter
+                            }
+                        })
+                    }else{
+                        this.$toast(res.data.result.failCause);
                     }
+                }).catch(err=>{
+                    console.log("")
                 })
+              
             }
         }
     }

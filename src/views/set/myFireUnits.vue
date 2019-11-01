@@ -13,13 +13,28 @@
         white-space: nowrap;
         text-overflow: ellipsis;
     }
+    .myFireUnitList{
+        .tips{
+            p{
+                line-height: 1.5;
+            }
+        }
+    }
+    
 </style>
 <template>
   <div class="myFireUnitList">
-      <base-nav title="防火单位管理" active="false"></base-nav>
-      <p class="pd28 color1">您可以对您的防火单位进行管理新增或者删除</p>
+      <base-nav title="我负责的防火单位" active="false"></base-nav>
+      <div class="tips pd28 color1">
+        <p>设置您负责进行维保的防火单位后，您可以：</p>
+        <p>1、接收该单位消防管理员发送的维保叫修申请</p>
+        <p>2、填报该单位的消防巡查记录</p>
+      </div>
+
+      
+      
       <div class="pd28 displayflex">
-          <span class="left_title">管辖单位</span>
+          <span class="left_title">防火单位</span>
          
            <img @click="addFireUnit" class="addiCON" src="../../assets/imgs/add.png" alt="">
       </div>
@@ -36,6 +51,7 @@
 </template>
 
 <script>
+import { Dialog } from 'vant';
 export default {
     data(){
         return{
@@ -88,14 +104,23 @@ export default {
                 SafeUserId:this.$store.state.userInfo.userId,
                 FireUnitId:item.fireUnitId
             }
-            this.$axios.post(this.$api.DelSafeUserFireUnit,data).then(res=>{
-                console.log("删除成功",res)
-                if (res.data.result.success) {
-                    this.$toast('删除成功')
-                }
-            }).catch(err=>{
-                console.log("删除失败",err)
+            Dialog.confirm({
+                title: '删除关联防火单位',
+                message: `确认删除${item.fireUnitName}的关联吗？`
+            }).then(() => {
+                this.$axios.post(this.$api.DelSafeUserFireUnit,data).then(res=>{
+                    console.log("删除成功",res)
+                    if (res.data.result.success) {
+                        this.$toast('删除成功')
+                        this.listData('refresh')
+                    }
+                }).catch(err=>{
+                    console.log("删除失败",err)
+                })
+            }).catch(()=>{
+                
             })
+           
         }
     }
 }

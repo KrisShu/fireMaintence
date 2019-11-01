@@ -58,7 +58,7 @@
       justify-content: space-around !important;
       margin-top: 30px;
       .van-button{
-        width: 300px;
+        width:100%;
         
       }
       .button2{
@@ -91,13 +91,12 @@
           <span class="left_title">巡查地点：</span>
             <van-field v-model="patrolAddress" placeholder="输入地点名称"/>
         </div>
-        <div class="patrolSystemBox pd28 van-hairline--bottom">
+        <!-- <div class="patrolSystemBox pd28 van-hairline--bottom">
           <p class="left_title">巡查系统</p>
           <van-checkbox-group   v-model="result">
             <van-checkbox v-for="(arr,index) in Systems" :key="index" shape="square" :name="arr">{{arr.systemName}}</van-checkbox>
           </van-checkbox-group>
-          
-        </div>
+        </div> -->
       </div>
       <!--  -->
       <div class="displayflex pd28 van-hairline--bottom">
@@ -123,9 +122,7 @@
       </div>
     </div>
     <div class="btns displayflex">
-      
-        <van-button type="info" @click="saveBack(0)" size="normal">保存并返回</van-button>
-        <van-button class="button2"  @click="saveBack(1)"  size="normal">保存并继续添加</van-button>
+        <van-button type="info" @click="saveBack(0)" size="normal">保存巡查轨迹点</van-button>
     </div>
     
   </div>
@@ -156,7 +153,7 @@ export default {
     }
   },
   created(){
-    this.getSystems();
+    // this.getSystems();
   },
   methods:{
     /* 接收base64格式的语音文件 */
@@ -166,35 +163,37 @@ export default {
     showrecordText(){
       this.isRecord = !this.isRecord
     },
-    getSystems(){
-      this.$axios.get(this.$api.GetFireUnitlSystem,{
-        params:{
-          FireUnitId :+ localStorage.getItem('fireUnitId'),
-        }
-      }).then(res=>{
-        console.log("获取巡查系统",res)
-        this.Systems = res.data.result
-      }).catch(err=>{
-        console.log("获取巡查系统失败",err)
-      })
-    },
+    // getSystems(){
+    //   this.$axios.get(this.$api.GetFireUnitlSystem,{
+    //     params:{
+    //       FireUnitId :+ localStorage.getItem('fireUnitId'),
+    //     }
+    //   }).then(res=>{
+    //     console.log("获取巡查系统",res)
+    //     this.Systems = res.data.result
+    //   }).catch(err=>{
+    //     console.log("获取巡查系统失败",err)
+    //   })
+    // },
     saveBack(flag){
       if (this.patrolAddress) {
         let val ={  }
         val.patrolAddress = this.patrolAddress;//巡查地址
-        val.systems =  this.result;//巡查系统
+        /*val.systems =  this.result;//巡查系统
         //巡查系统的id
         let systemid = [];
         for(let arr of  this.result){
           systemid.push(arr.fireSystemId)
         }
-        val.systemid = systemid.join(",")
+        val.systemid = systemid.join(",")*/
         //巡查结果
         val.ProblemStatus = this.isfind ? (this.issolution ? 2:3) :1 ;
         //ProblemRemarkType----文字还是语音
         if (this.recordTexts.voice) {//语音
+          console.log("添加时的打印",this.recordTexts.duration)
           val.ProblemRemarkType = 2
           val.RemarkVioceT = this.recordTexts.voice //原路径的
+          val.duration = this.recordTexts.duration
           //file对象的
           val.RemarkVioce = this.voiceFile
         }else{//文字

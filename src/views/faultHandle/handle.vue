@@ -1,5 +1,11 @@
 <style lang="less">
   #handle{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    .content{
+      flex: 1;
+    }
     .pd28{
       padding:30px; 
     }
@@ -30,15 +36,18 @@
     }
     /*  */
     .problem_handle{
+
       .handleBox{
-        background-color: #f0f0f0;
+        padding: 30px 0px;
+        background-color: #f3f2f2;
         margin-top: 40px;
+        border-radius: 8px;
         .van-cell-group{
-           background-color: #f0f0f0;
+           background-color: #f3f2f2;
         }
         .van-cell{
           padding: 0px;
-           background-color: #f0f0f0;
+           background-color: #f3f2f2;
            .van-cell__title{
              font-size: 26px;
            }
@@ -85,52 +94,54 @@
   
   <div id="handle">
       <base-nav active='0' title="设施故障待处理"></base-nav>
-      <!--  -->
-      <div class="source pd28 van-hairline--bottom">
-        <span class="left_tip">问题来源:</span>
-        <span style="margin-right: 10px;" v-if="BreakDownInfo.source == 1">值班</span>
-        <span style="margin-right: 10px;" v-if="BreakDownInfo.source == 2">巡查</span>
-        <span style="margin-right: 10px;" v-if="BreakDownInfo.source == 3">物联终端</span>
-        <span>{{BreakDownInfo.userName}} ({{BreakDownInfo.phone}})</span>
+        <div class="content">
+          <!--  -->
+          <div class="source pd28 van-hairline--bottom">
+            <span class="left_tip">问题来源:</span>
+            <span style="margin-right: 10px;" v-if="BreakDownInfo.source == 1">值班</span>
+            <span style="margin-right: 10px;" v-if="BreakDownInfo.source == 2">巡查</span>
+            <span style="margin-right: 10px;" v-if="BreakDownInfo.source == 3">物联终端</span>
+            <span>{{BreakDownInfo.userName}} ({{BreakDownInfo.phone}})</span>
 
-      </div>
-      <!--  -->
-      <div class="find_time pd28  van-hairline--bottom">
-        <span class="left_tip">发现时间:</span>
-        <span>{{BreakDownInfo.creationTime}}</span>
-      </div>
-      <!--  -->
-      <div class="problem_describetion pd28 van-hairline--bottom">
-        <p class="left_tip">问题描述:</p>
-        <p class="describetion" v-if="BreakDownInfo.problemRemakeType == 1">
-         {{BreakDownInfo.remakeText}}
-        </p>
-        <base-play-record v-if="BreakDownInfo.problemRemakeType == 2" :recordVoice="BreakDownInfo.remakeText" class="base_play_record" :isEdit='false'></base-play-record>
-        <base-take-photo :istakePhoto="false" :trueImgs="BreakDownInfo.truephotoList" :Imgs="BreakDownInfo.photoList"></base-take-photo>
-      </div>
-      <!--  -->
-      <div class="problem_handle pd28">
-       <p class="left_tip">问题处理</p>
-       <div class="handleBox">
-        
-          <van-cell-group class="pd20 van-hairline--bottom">
-            <van-switch-cell v-model="checked" title="是否已解决" />
-          </van-cell-group>
-
-          <div class="howtoHandle pd20">
-            <p class="text">问题处理途径</p>
-            <van-radio-group v-model="radio">
-              <van-radio name="1">维保叫修</van-radio>
-            </van-radio-group>
           </div>
-
-          <div class="pd20">
-            <van-cell-group>
-              <van-field v-model="message" label="备注" type="textarea"  placeholder="请输入留言" rows="3" autosize />
-            </van-cell-group>
+          <!--  -->
+          <div class="find_time pd28  van-hairline--bottom">
+            <span class="left_tip">发现时间:</span>
+            <span>{{BreakDownInfo.creationTime}}</span>
           </div>
-       </div>
-      </div>
+          <!--  -->
+          <div class="problem_describetion pd28 van-hairline--bottom">
+            <p class="left_tip">问题描述:</p>
+            <p class="describetion" v-if="BreakDownInfo.problemRemakeType == 1">
+            {{BreakDownInfo.remakeText}}
+            </p>
+            <base-play-record v-if="BreakDownInfo.problemRemakeType == 2" :time="BreakDownInfo.voiceLength" :recordVoice="BreakDownInfo.voice" class="base_play_record" :isEdit='false'></base-play-record>
+            <base-take-photo :istakePhoto="false" :trueImgs="BreakDownInfo.truephotoList" :Imgs="BreakDownInfo.photoList"></base-take-photo>
+          </div>
+          <!--  -->
+          <div class="problem_handle pd28">
+          <p class="left_tip">问题处理</p>
+          <div class="handleBox">
+            
+              <van-cell-group class="pd20 van-hairline--bottom">
+                <van-switch-cell v-model="checked" title="是否已解决" />
+              </van-cell-group>
+
+              <div class="howtoHandle pd20">
+                <p class="text">问题处理途径</p>
+                <van-radio-group v-model="radio">
+                  <van-radio name="1">维保叫修</van-radio>
+                </van-radio-group>
+              </div>
+
+              <div class="pd20">
+                <van-cell-group>
+                  <van-field v-model="message" label="备注" type="textarea"  placeholder="请输入留言" rows="6" autosize />
+                </van-cell-group>
+              </div>
+          </div>
+          </div>
+        </div>
       <!--  -->
         <div class="btns">
             <van-button type="info" @click="submit" size="large">提交</van-button>
@@ -183,7 +194,7 @@ export default {
           BreakDownId
         }
       }).then(res=>{
-       
+        console.log("this.BreakDownInfo",res.data.result)
         this.BreakDownInfo =  res.data.result
         this.BreakDownInfo.photoList =[];
         this.BreakDownInfo.truephotoList =[];
@@ -195,6 +206,11 @@ export default {
         //便利缩略图
         for(let arr of  res.data.result.photosBase64){
           this.BreakDownInfo.photoList.push(`data:image/;base64,${arr}`)
+        }
+
+        //语音文字
+        if (res.data.result.problemRemakeType == 2) {
+            this.BreakDownInfo.voice = `${this.$url}${res.data.result.remakeText}`;
         }
 
           console.log("获取BreakDownId",res)

@@ -149,6 +149,16 @@ export default {
         },
         /* 打开相册 */
         getImg(){
+            let that = this;
+            plus.gallery.pick(
+                function(path) {
+                    that.getBase64Time(path);
+                },
+                function(e) {
+                console.log("取消选择图片");
+                },
+                { filter: "image" }
+            );
 
         },
         /* 照片转码成base64加上时间水印 */

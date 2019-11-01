@@ -10,7 +10,7 @@
             justify-content: center;
                 img{
                     width: 457px;
-                    height: 88px;
+                    height: 98px;
                 }
                 p{
                     font-size: 36px;
@@ -70,7 +70,7 @@
       <base-nav title="登录" :showLeft="false"></base-nav>
       <div class="titleDiv">
         <img src="../../assets/imgs/load_img_01.png" alt="">
-        <p>作业终端</p>
+        <p>维保单位作业终端</p>
       </div>
 
     <van-cell-group>
@@ -85,12 +85,12 @@
     </van-cell-group>
         <div class="checked_forget">
             <van-checkbox v-model="checked">自动登录</van-checkbox>
-            <p class="forget">忘记密码</p>
+            <!-- <p class="forget">忘记密码</p> -->
         </div>
 
         <div class="btns">
             <van-button type="info" @click="login" size="large">登录</van-button>
-            <van-button @click="$router.push('/registerInvation')" type="info" size="large">维保单位管理员注册</van-button>
+            <van-button @click="$router.push('/registerInvation')" type="info" size="large">维保单位员工注册</van-button>
         </div>
 
         
@@ -133,12 +133,9 @@ export default {
                    }
                 }).catch(err=>{
                      console.log("登录失败",res)
+                    this.$toast('网络连接超时，请稍后重试');
                 })
             }
-
-            // this.$router.push({
-            //     path:'/'
-            // })
         }
     }
 }

@@ -19,7 +19,7 @@ Vue.use(vConsole);
 Vue.use(Vant)
 Vue.config.productionTip = false
 axios.defaults.baseURL = 'http://fd.sctsjkj.com:5080' //* axios线上接口ip地址 
-
+axios.defaults.timeout = 60000
 //刷新页面 stroe也不会被清空
 let val = localStorage.getItem("userInfo");
 if(val){

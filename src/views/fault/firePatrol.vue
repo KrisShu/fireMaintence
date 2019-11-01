@@ -1,5 +1,6 @@
 <style lang="less">
 #firePatrolBox{
+  background: #f3f3f3;
   .van-tabs__line{
     background-color: #039cfe;
   }
@@ -75,7 +76,16 @@
           color: #ff8a00;
         }
     }
+    
 }
+  .nosubmitBox{
+    padding: 10px 34px;
+    font-size: 26px;
+    background: white;
+      .redStatus{
+        color: red;
+      }
+  }
   
 }
 
@@ -91,6 +101,12 @@
                 </div>
             </van-dropdown-menu>
         </van-cell>
+        <div @click="gotoaddpatrol" v-if="$store.state.TrajectroyList.length>0" class="nosubmitBox">
+          <p class="van-hairline--bottom displayflex pd28_topBottom">
+            <span>巡查轨迹</span>
+            <span class="redStatus">未提交</span>
+          </p>
+        </div>
 
      <!-- 列表 -->
     <base-list @pathTo="gotoDetails" @onLoad="GetPatrollist" @refresh="GetPatrollist" :finished="finished" :tableList="tableList" >
@@ -140,6 +156,15 @@ export default {
   mounted(){
   },
   methods:{
+    /* 存在未提交的 */
+    gotoaddpatrol(){
+        this.$router.push({
+              path:'/addPatrol',
+              query:{
+                  add :true
+              }
+        })
+    },
    GetPatrollist(flag){
      let p = this.page
       if (flag == 'onLoad') {
@@ -187,13 +212,20 @@ export default {
       }
     }).then(res=>{
       console.log("是否可以添加",res)
+
+     
       if (res.data.result.success) {
-            // this.$router.push({
-            //   path:'/addPatrol',
-            //   query:{
-            //       add :true
-            //   }
-            // })
+          if (this.$store.state.TrajectroyList.length>0) {
+            this.$toast('有未提交的巡查轨迹点，请提交后再新增');
+          }else{
+              this.$router.push({
+                path:'/addPatrol',
+                query:{
+                    add :true
+                }
+              })
+          }
+         
       }else{
          this.$toast(res.data.result.failCause);
       }
@@ -201,12 +233,12 @@ export default {
       console.log(err)
     })
 
-    this.$router.push({
-      path:'/addPatrol',
-      query:{
-          add :true
-      }
-    })
+    // this.$router.push({
+    //   path:'/addPatrol',
+    //   query:{
+    //       add :true
+    //   }
+    // })
 
    },
    /*  */

@@ -8,6 +8,7 @@
         border: none;
         resize: none;
         text-indent: 20px;
+        line-height: 1.5;
     }
     .recordBox{
 
@@ -34,7 +35,7 @@
         </div>
       <!-- 录制语音 -->
       <div class="pd28 recordBox" v-else>
-        <base-play-record v-show="recordTexts.voice" v-model="recordTexts.voice"></base-play-record>
+        <base-play-record v-show="recordTexts.voice" @voiceduration="getvoiceduration" v-model="recordTexts.voice"></base-play-record>
         <base-record @Vocieto="Vocieto" v-model="recordTexts.voice"></base-record>
       </div>
   </div>
@@ -60,6 +61,10 @@ export default {
         }
     },
     methods:{
+        /* 获取语音的长度 */
+        getvoiceduration(val){
+            this.recordTexts.duration = val
+        },
         Vocieto(voiceFile){
             this.Audio2dataURL(voiceFile)
         },

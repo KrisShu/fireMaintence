@@ -10,6 +10,13 @@
   .van-list{
     // padding-bottom: 100px;
   }
+  .nodata{
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
 }
 
 
@@ -22,6 +29,10 @@
           <slot name="content" :item='item'></slot>
         </van-cell>
       </van-list>
+      <div v-if="tableList.length<=0" class="nodata">
+        <img src="../../src/assets/imgs/nodata.png" alt="">
+         <slot name="nodataTips"></slot>
+      </div>
     </van-pull-refresh>
 
   </div>
@@ -64,10 +75,11 @@ export default {
   },
   methods: {
     onLoad() {
+      //延迟请求加载
       setTimeout(() => {
           this.$emit('onLoad','onLoad')
           this.loading = false
-          }, 500)
+      }, 500)
    
     },
     onRefresh() {

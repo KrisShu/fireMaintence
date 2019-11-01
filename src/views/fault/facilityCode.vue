@@ -66,6 +66,8 @@
 
 <script>
 import baseSweepCode from '../../components/baseSweepCode'
+import { Toast } from 'vant';
+import { Dialog } from 'vant';
 export default {
   components:{
     baseSweepCode
@@ -128,18 +130,29 @@ export default {
     },
     /* 删除 */
     deleteCode(item){
-      let data = {
-        opreation:0,
-        id:item.id,
-        equiNo:item.equiNo,
-        address:item.address,
-        fireSystemId:item.fireSystemId
-      }
-    this.$axios.put(this.$api.UpdateEquipmentNoInfo,data).then(res=>{
-        console.log("删除成功",res)
-    }).catch(err=>{
-        console.log("删除失败",err)
-    })
+      Dialog.confirm({
+        title: '设施编码',
+        message: '确认删除设施编码吗？'
+      }).then(() => {
+        let data = {
+          opreation:0,
+          id:item.id,
+          equiNo:item.equiNo,
+          address:item.address,
+          fireSystemId:item.fireSystemId
+        }
+        this.$axios.put(this.$api.UpdateEquipmentNoInfo,data).then(res=>{
+            this.$toast('删除成功')
+            this.listData('refresh')
+        }).catch(err=>{
+            console.log("删除失败",err)
+        })
+
+      }).catch(() => {
+        // on cancel
+      });
+      
+   
 
     }
   }

@@ -70,7 +70,7 @@
        <p class="describetion" v-if="BreakDownInfo.problemRemakeType ==1">
          {{BreakDownInfo.remakeText}}
         </p>
-       <base-play-record v-if="BreakDownInfo.problemRemakeType ==2" :recordVoice="BreakDownInfo.remakeText" class="base_play_record" :isEdit='false'></base-play-record>
+       <base-play-record  v-if="BreakDownInfo.problemRemakeType ==2" :recordVoice="BreakDownInfo.remakeText" class="base_play_record top20" :isEdit='false'></base-play-record>
         <base-take-photo :istakePhoto="false" :trueImgs="BreakDownInfo.truephotoList" :Imgs="BreakDownInfo.photoList"></base-take-photo>
       </div>
       <!--  -->

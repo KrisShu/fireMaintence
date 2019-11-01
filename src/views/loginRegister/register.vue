@@ -91,6 +91,7 @@ export default {
                 this.$axios.post(this.$api.USER_REGIST,registerFrom).then(res=>{
                     
                     if(res.data.result.success){
+                       this.$toast('注册成功，请登录')
                        this.$router.push({
                            path:"/login"
                        })
@@ -98,7 +99,7 @@ export default {
                         this.$toast(res.data.result.failCause)
                     }
                 }).catch(err=>{
-                    console.log("注册失败",res)
+                    console.log("注册失败",err)
                 })
             }
         }

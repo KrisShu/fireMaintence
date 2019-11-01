@@ -6,7 +6,7 @@
 </style>
 <template>
     <div class="allFireUnits">
-        <base-nav title="新增防火单位"></base-nav>
+        <base-nav title="关联防火单位"></base-nav>
         <div class="listBox pd28">
             <base-list @pathTo="add" @refresh="listData"  :finished="finished"  @onLoad="listData" :tableList="fireUnitList">
                 <div class="slotBox" slot="content" slot-scope="scope">

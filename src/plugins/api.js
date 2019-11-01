@@ -4,7 +4,7 @@ const API ={
     USER_REGIST:"/api/services/app/SafeUnit/UserRegist",//用户注册
     USER_LOGOUT:"/api/services/app/SafeUnit/UserLogout",//用户注销
     GetSelectSafeUnits:"/api/services/app/SafeUnit/GetSelectSafeUnits",//获取单位名称
-
+    InvitatVerify:'/api/services/app/SafeUnit/InvitatVerify',//邀请码验证
     // 
     GetSafeUnitUserEvent:"/api/services/app/SafeUnit/GetSafeUnitUserEvent",//查询维保事务列表
     //故障处理

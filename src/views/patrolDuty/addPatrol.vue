@@ -55,10 +55,10 @@
         巡查人员：吴亦凡
       </p>
     </div>
-    <!--  -->
-      <div class="patrol_details">
-        <patrol-details :PatrolId="PatrolId" :add="isadd"></patrol-details>
-      </div>
+    <!-- 增加模块的添加按钮 -->
+    <div class="patrol_details">
+      <patrol-details :PatrolId="PatrolId" :add="isadd"></patrol-details>
+    </div>
     <!--  -->
   </div>    
 </template>
