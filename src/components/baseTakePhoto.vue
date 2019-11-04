@@ -47,7 +47,7 @@
                 </van-grid-item>
                 <van-grid-item @click="showImg(index)" v-for="(value,index) in takeImgs" :key="index">
                     <van-image class="img" :src="value" />
-                    <img @click="takeImgs.splice(index, 1)" class="deleteIcon" src="../assets/imgs/delete.png" />
+                    <img @click.stop="deleteImg(index)" class="deleteIcon" src="../assets/imgs/delete.png" />
                 </van-grid-item>
             </van-grid>
         </div>
@@ -70,6 +70,8 @@ export default {
     },
     props:{
         takeImgs:Array,
+        takeImgsbase64:Array,
+        takeImgSrc:Array,
         istakePhoto:{
             type:Boolean,
             default(){
@@ -135,13 +137,18 @@ export default {
                     //获取拍照后的真实地址
                     plus.io.resolveLocalFileSystemURL(path,function(entry) {
                         console.log("拍照获取的真实路径",entry.fullPath)
-                        var imgSrc = entry.toLocalURL();//
-                        that.getBase64Time(imgSrc)
+                         that.takeImgs.push(entry.fullPath);
+                         var imgSrc = entry.toLocalURL();
+                         console.log("imgSrcimgSrc",imgSrc)
+                         that.takeImgSrc.push(imgSrc);
+                         that.$emit('update:takeImgSrc', that.takeImgSrc) //双向绑定还是要抛出？这是个疑问
+                        //  var imgSrc = entry.toLocalURL();
+                        //  that.getBase64Time(imgSrc)
                         
                     },
                     function(e) {
                         console.log(e.message);
-                    }
+                    },{ resolution: res, format: fmt }
                     );
 
                 }
@@ -181,9 +188,9 @@ export default {
                 ctx.textBaseline = "middle";
                 ctx.fillText(time,image.width-20,image.height-100);
                 let dataURL = canvas.toDataURL( "image/png/jpg"); 
-                that.takeImgs.push(dataURL);
-                that.$emit('change',that.takeImgs) //双向绑定还是要抛出？这是个疑问
-                console.log("组件里的that.takeImgs",that.takeImgs)
+                that.takeImgsbase64.push(dataURL);
+                that.$emit('update:takeImgsbase64', that.takeImgsbase64) //双向绑定还是要抛出？这是个疑问
+                console.log("组件里的that.takeImgs",that.takeImgsbase64)
             };
             image.src = url
         },
@@ -227,9 +234,12 @@ export default {
             
         },
         /* 删除图片 */
-        // deleteImg(index){
-        //     this.takeImgs.
-        // }
+        deleteImg(index){
+            console.log("图片删除的",index)
+           this.takeImgs.splice(index, 1);
+           this.takeImgSrc.splice(index, 1);
+        //    this.takeImgsbase64.splice(index, 1);
+        }
     }
 }
 </script>

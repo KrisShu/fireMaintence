@@ -118,7 +118,8 @@
       <!--  -->
       <div class="pd28">
         <p class="left_title">现场照片：</p>
-        <baseTakePhoto v-model="takeImgs"></baseTakePhoto>
+        <!-- <baseTakePhoto :takeImgsbase64.sync="takeImgsbase64" v-model="takeImgs"></baseTakePhoto> -->
+        <baseTakePhoto  :takeImgSrc.sync="takeImgSrc" v-model="takeImgs"></baseTakePhoto>
       </div>
     </div>
     <div class="btns displayflex">
@@ -150,6 +151,8 @@ export default {
       recordTexts:{},
       voiceFile:'',//
       takeImgs:[],//现场照片
+      takeImgsbase64:[],//现场照片base64
+      takeImgSrc:[],//现场照片base64
     }
   },
   created(){
@@ -205,30 +208,39 @@ export default {
         val.creationTime = new Date().toLocaleString();
         //巡查图片
         if (this.takeImgs) {
-           val.photoListFile =[];
-           val.photoList =[];
           console.log("this.takeImgs",this.takeImgs.length)
+          // console.log("this.takeImgsbase64",this.takeImgsbase64.length)
+          val.photoListFile =[];
+          val.photoList =[];
           for(let i in this.takeImgs){
             //base64水印图片转文件对象
-            val.photoListFile.push(this.base64TOfile(this.takeImgs[i]))
-            //正常base64水印图片
-            val.photoList.push(this.takeImgs[i])
+            val.photoList.push(this.takeImgs[i])//正常手机图片路径
           }
+          // for (let y in this.takeImgsbase64) {
+          //    val.photoListFile.push(this.base64TOfile(this.takeImgsbase64[y]))
+          // }
+          for (let y in this.takeImgSrc) {
+             val.photoListFile.push(this.takeImgSrc[y])
+          }
+        }else{
+          console.log("没有获取到照片哦")
         }
-       let patrolArray = this.$store.state.TrajectroyList
+       let patrolArray = localStorage.getItem('patrolArray')
          if (!patrolArray) {
+           console.log("没有")
           patrolArray = [];
         } else {
-          patrolArray = patrolArray;
+          console.log("有")
+          patrolArray =JSON.parse(patrolArray);
         }
         patrolArray.unshift(val)//
+        localStorage.setItem('patrolArray',JSON.stringify(patrolArray))
         this.$store.commit('setTrajectroyList',patrolArray)
         this.$toast.success("本地保存成功,请尽快提交");
         flag ? this.$router.go(0): this.$router.back();
       }else{
        this.$toast('请填写正确的巡查地点');
       }
-      // console.log("this.recordTexts.text",this.recordTexts.text)
     },
     /* base64转文件 */
     base64TOfile(base64){

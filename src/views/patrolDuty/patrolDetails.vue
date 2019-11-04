@@ -219,7 +219,9 @@ export default {
       problemcount:[],//
       patrolTrajectroy:[],//查看
       localList:[],//本地信息,
-      add_patrolId:''
+      add_patrolId:'',
+
+      takeImgsbase64:[]
     }
   },
   created(){
@@ -233,6 +235,8 @@ export default {
   methods:{
     deleteTrajectroy(index){
       this.localList.splice(index,1)
+     localStorage.setItem('patrolArray',JSON.stringify(this.localList))
+     console.log("删除之后",this.$store.state.TrajectroyList.length)
     },
     showTrajectroy(item){
       console.log("this.add",this.add)
@@ -274,12 +278,109 @@ export default {
     },
     /* 获取本地 */
     getLocal(){
-      console.log("this.$store.state.localTrajectroy",this.$store.state.TrajectroyList)
-       this.localList = this.$store.state.TrajectroyList
+      console.log("this.$store.state.localTrajectroy",localStorage.getItem('patrolArray'),this.$store.state.TrajectroyList)
+      if (JSON.parse(localStorage.getItem('patrolArray')) ) {
+        // this.localList = JSON.parse(localStorage.getItem('patrolArray')) 
+        if (JSON.parse(localStorage.getItem('patrolArray')).length >0) {
+
+          this.localList = this.$store.state.TrajectroyList
+          console.log("this.localList的长度", this.localList.length)
+          for (let index = 0; index < this.localList.length; index++) {
+            console.log("循环数据")
+            if (this.localList[index].photoListFile.length) {
+              console.log("有图片就转码")
+              this.takeImgsbase64[index] = {}
+              for (let y = 0; y < this.localList[index].photoListFile.length; y++) {
+               this.takeImgsbase64[index].file=[]
+                  this.takeImgsbase64[index].file.push(this.getBase64Time(this.localList[index].photoListFile[y]))
+              
+              }
+            }else{
+              console.log("没有图片的接阔")
+               this.takeImgsbase64[index] = 1
+            }
+            
+            
+          }
+
+        }
+      }
+       
     },
+    getBase64Time(url){
+            console.log("调用此方法",url)
+            let that =this;
+            let canvas = document.createElement("canvas"),
+            ctx = canvas.getContext("2d"),
+            image = new Image();
+            image.crossOrigin = "Anonymous";
+            image.onload = function() {//这里是一个异步，所以获取到的base64文件需要用回调
+                canvas.height = image.height;
+                canvas.width = image.width;
+                ctx.drawImage(image, 0, 0);
+                ctx.font ="200px Arial";
+                ctx.fillStyle = "tomato"; 
+                let time = that.getCurrnetTime("timeSign");//获取当前的时间
+                 console.log("time",time)
+                ctx.textAlign = "end";
+                ctx.textBaseline = "middle";
+                ctx.fillText(time,image.width-20,image.height-100);
+                let dataURL = canvas.toDataURL( "image/png/jpg"); 
+                // console.log("dataURL",dataURL)
+                return dataURL
+                // that.takeImgsbase64.push(dataURL);
+                // that.$emit('update:takeImgsbase64', that.takeImgsbase64) //双向绑定还是要抛出？这是个疑问
+                // console.log("组件里的that.takeImgs",that.takeImgsbase64)
+            };
+            image.src = url
+        },
+         //获取当前时间
+        getCurrnetTime(flga){
+            let now = new Date(),
+            year = now.getFullYear(), //得到年份
+            month = now.getMonth()+1,//得到月份
+            date = now.getDate(),//得到日期
+            hour = now.getHours(),//得到小时
+            minu = now.getMinutes(),//得到分钟
+            seconds = now.getSeconds();//得到秒
+
+            month = month<10?'0'+ month : month;
+            date =date<10?'0'+ date : date;
+            hour =hour<10?'0'+ hour : hour;
+            minu = minu<10?'0'+ minu : minu;
+            seconds = seconds<10?'0'+ seconds : seconds;
+            if(flga == 'timeSign'){
+                return year + "-" + month + "-" + date +" "+hour+":"+minu
+            }else if(flga == 'name'){//返回时间戳
+                return now.getTime()
+            }
+            
+        },
+
+         base64TOfile(base64){
+           console.log("base64",base64)
+          let that = this;
+          var arr = base64.split(',');
+          var mime = arr[0].match(/:(.*?);/)[1];
+          var bstr = atob(arr[1]); // 解码base-64编码的数据
+          var n = bstr.length; 
+          var u8arr = new Uint8Array(n);// 无符号整型数组
+          while(n--){
+              u8arr[n] = bstr.charCodeAt(n);
+          }
+          //转换成file对象
+          let filename = new Date().getTime();
+          let filetest = new File([u8arr], filename, {type:mime})
+          return filetest
+        },
+
+
+
     /* 提交 */
     // 新建一个巡查对象，然后返回ID，再依次添加数据
     submit(){
+      
+      console.log("转化的base64",this.takeImgsbase64,this.takeImgsbase64.length)
       Toast.loading({
         duration: 0,
         mask: true,
@@ -304,27 +405,36 @@ export default {
     /* submit */
     submitTrajectroy(){
       let that = this;
-      for(let arr of this.localList){
-           let param = new FormData();
-            param.append("PatrolId",that.add_patrolId)
-            param.append("PatrolAddress",arr.patrolAddress)
-            param.append("ProblemStatus",arr.ProblemStatus)
-            param.append("ProblemRemarkType",arr.ProblemRemarkType)
-            param.append("ProblemRemark",arr.ProblemRemark)
-            param.append("RemarkVioce", arr.RemarkVioce)
-            console.log(" arr.duration)", arr.duration)
-            param.append("VoiceLength", arr.duration)
-            for (let y in arr.photoListFile){
-               param.append(`LivePicture${Number(y) + 1}`, arr.photoListFile[y]);
+      for (let index = 0; index < this.localList.length; index++) {
+        let param = new FormData();
+        param.append("PatrolId",that.add_patrolId)
+        param.append("PatrolAddress",this.localList[index].patrolAddress)
+        param.append("ProblemStatus",this.localList[index].ProblemStatus)
+        param.append("ProblemRemarkType",this.localList[index].ProblemRemarkType)
+        param.append("ProblemRemark",this.localList[index].ProblemRemark)
+        param.append("RemarkVioce", this.localList[index].RemarkVioce)
+          if ( this.localList[index].RemarkVioce) {
+                 param.append("VoiceLength", this.localList[index].duration)
+          }
+          if (this.localList[index].photoListFile.length) {
+            for (let y = 0; y <  this.takeImgsbase64[index].file.length; y++) {
+              
+              let fileImg = this.base64TOfile(this.takeImgsbase64[index].file[y])
+              console.log("fileImg",fileImg)
+              param.append(`LivePicture${Number(y) + 1}`, fileImg);
             }
+           
+          }
+      }
 
-            this.$axios.post(this.$api.AddPatrolTrackDetail,param).then(res => {
+       this.$axios.post(this.$api.AddPatrolTrackDetail,param).then(res => {
               console.log("添加巡查轨迹反馈",res)
                   Toast.clear();
                   that.$toast.success("提交成功");
                   that.$router.push({
                     name:'firePatrol'
                   });
+                  localStorage.removeItem('patrolArray')
                   this.$store.commit('setTrajectroyList',[])
             }).catch(err=>{
               console.log("请求错误",err)
@@ -333,7 +443,46 @@ export default {
             })
 
       }
-    }
+
+
+      // for(let arr of this.localList){
+      //      let param = new FormData();
+      //       param.append("PatrolId",that.add_patrolId)
+      //       param.append("PatrolAddress",arr.patrolAddress)
+      //       param.append("ProblemStatus",arr.ProblemStatus)
+      //       param.append("ProblemRemarkType",arr.ProblemRemarkType)
+      //       param.append("ProblemRemark",arr.ProblemRemark)
+      //       param.append("RemarkVioce", arr.RemarkVioce)
+      //       console.log(" arr.duration)", arr.duration)
+      //       console.log(" arr.photoListFile)", arr.photoListFile,arr.photoListFile.length)
+      //       if ( arr.RemarkVioce) {
+      //            param.append("VoiceLength", arr.duration)
+      //       }
+      //     if (arr.photoListFile.length) {
+      //        for (let y in arr.photoListFile){
+      //          //转换为文件
+      //           that.base64TOfile(that.takeImgsbase64[y])
+      //          param.append(`LivePicture${Number(y) + 1}`, arr.photoListFile[y]);
+      //       }
+      //     }
+           
+
+      //       this.$axios.post(this.$api.AddPatrolTrackDetail,param).then(res => {
+      //         console.log("添加巡查轨迹反馈",res)
+      //             Toast.clear();
+      //             that.$toast.success("提交成功");
+      //             that.$router.push({
+      //               name:'firePatrol'
+      //             });
+      //             localStorage.removeItem('patrolArray')
+      //             this.$store.commit('setTrajectroyList',[])
+      //       }).catch(err=>{
+      //         console.log("请求错误",err)
+      //          Toast.clear();
+      //          this.$toast('网络连接超时请稍后重试')
+      //       })
+
+      // }
 
   }
 }

@@ -101,7 +101,7 @@
                 </div>
             </van-dropdown-menu>
         </van-cell>
-        <div @click="gotoaddpatrol" v-if="$store.state.TrajectroyList.length>0" class="nosubmitBox">
+        <div @click="gotoaddpatrol" v-if="nosubmitList.length>0" class="nosubmitBox">
           <p class="van-hairline--bottom displayflex pd28_topBottom">
             <span>巡查轨迹</span>
             <span class="redStatus">未提交</span>
@@ -149,11 +149,21 @@ export default {
         SkipCount:0,
         MaxResultCount:10,
       },
+      nosubmitList:[]//未提交数据
       
 
     }
   },
   mounted(){
+  },
+  created(){
+    if (JSON.parse(localStorage.getItem('patrolArray'))) {
+      if (JSON.parse(localStorage.getItem('patrolArray')).length>0) {
+           this.nosubmitList = JSON.parse(localStorage.getItem('patrolArray'))
+      }
+       
+    }
+    
   },
   methods:{
     /* 存在未提交的 */
@@ -212,18 +222,26 @@ export default {
       }
     }).then(res=>{
       console.log("是否可以添加",res)
-
-     
       if (res.data.result.success) {
-          if (this.$store.state.TrajectroyList.length>0) {
-            this.$toast('有未提交的巡查轨迹点，请提交后再新增');
-          }else{
+          if (localStorage.getItem('patrolArray')) {
+            if(JSON.parse(localStorage.getItem('patrolArray')).length>0 ) {
+               this.$toast('有未提交的巡查轨迹点，请提交后再新增');
+            }else{
               this.$router.push({
                 path:'/addPatrol',
                 query:{
                     add :true
                 }
               })
+            }
+           
+          }else{
+            this.$router.push({
+                path:'/addPatrol',
+                query:{
+                    add :true
+                }
+            })
           }
          
       }else{

@@ -22,6 +22,12 @@ axios.defaults.baseURL = 'http://fd.sctsjkj.com:5080' //* axios线上接口ip地
 axios.defaults.timeout = 60000
 //刷新页面 stroe也不会被清空
 let val = localStorage.getItem("userInfo");
+let patrolArray = localStorage.getItem('patrolArray')
+if (patrolArray) {
+  console.log("youyouyouyouyouyouyouyouyouyou")
+    let patrolArrayinfo = JSON.parse(patrolArray)
+    store.commit('setTrajectroyList',patrolArrayinfo)      
+}
 if(val){
   let info = JSON.parse(val);
   store.commit("setuserInfo",info)
