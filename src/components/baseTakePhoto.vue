@@ -141,7 +141,7 @@ export default {
                          var imgSrc = entry.toLocalURL();
                          console.log("imgSrcimgSrc",imgSrc)
                          that.takeImgSrc.push(imgSrc);
-                         that.$emit('update:takeImgSrc', that.takeImgSrc) //双向绑定还是要抛出？这是个疑问
+                         that.$emit('update:takeImgSrc', that.takeImgSrc) //双向绑定还是要抛出？这是个疑问  //在这里拍照  并将数据抛出
                         //  var imgSrc = entry.toLocalURL();
                         //  that.getBase64Time(imgSrc)
                         
@@ -159,7 +159,10 @@ export default {
             let that = this;
             plus.gallery.pick(
                 function(path) {
-                    that.getBase64Time(path);
+                    that.takeImgs.push(path);
+                    that.takeImgSrc.push(path);
+                    that.$emit('update:takeImgSrc', that.takeImgSrc)
+                    // that.getBase64Time(path);
                 },
                 function(e) {
                 console.log("取消选择图片");

@@ -13,9 +13,9 @@ import api from './plugins/api.js'
 Vue.prototype.$axios = axios
 Vue.prototype.$api = api
 Vue.prototype.$url = "http://fd.sctsjkj.com:5080"; // 全局服务器地址
-import VConsole from 'vconsole';
-let vConsole = new VConsole();
-Vue.use(vConsole);
+// import VConsole from 'vconsole';
+// let vConsole = new VConsole();
+// Vue.use(vConsole);
 Vue.use(Vant)
 Vue.config.productionTip = false
 axios.defaults.baseURL = 'http://fd.sctsjkj.com:5080' //* axios线上接口ip地址 

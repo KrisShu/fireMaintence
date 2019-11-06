@@ -221,7 +221,8 @@ export default {
       localList:[],//本地信息,
       add_patrolId:'',
 
-      takeImgsbase64:[]
+      takeImgsbase64:[],
+      voicebase64:[],
     }
   },
   created(){
@@ -283,21 +284,33 @@ export default {
         // this.localList = JSON.parse(localStorage.getItem('patrolArray')) 
         if (JSON.parse(localStorage.getItem('patrolArray')).length >0) {
 
-          this.localList = this.$store.state.TrajectroyList
+          this.localList = this.$store.state.TrajectroyList //在这里获取vuex里的数据
           console.log("this.localList的长度", this.localList.length)
           for (let index = 0; index < this.localList.length; index++) {
             console.log("循环数据")
+            //图片
             if (this.localList[index].photoListFile.length) {
               console.log("有图片就转码")
               this.takeImgsbase64[index] = {}
               for (let y = 0; y < this.localList[index].photoListFile.length; y++) {
                this.takeImgsbase64[index].file=[]
-                  this.takeImgsbase64[index].file.push(this.getBase64Time(this.localList[index].photoListFile[y]))
-              
+                  this.getBase64Time(this.localList[index].photoListFile[y]).then(res=>{
+                    this.takeImgsbase64[index].file[y] = res
+                  })
               }
             }else{
               console.log("没有图片的接阔")
                this.takeImgsbase64[index] = 1
+            }
+
+            //语音
+            if (this.localList[index].RemarkVioceT) {
+              this.Audio2dataURL(this.localList[index].RemarkVioceT).then(res=>{
+                 this.voicebase64[index] = res
+              })
+             
+            }else{
+              this.voicebase64[index] = 1
             }
             
             
@@ -307,33 +320,63 @@ export default {
       }
        
     },
+     /* 本地文件转base64 */
+      Audio2dataURL(vociePath){
+        let that = this;
+        return new Promise((resolve,reject)=>{
+          plus.io.resolveLocalFileSystemURL(vociePath,function(entry){
+              entry.file(function (file){
+              console.log("语音文件对象",file)
+              var fileReader = new plus.io.FileReader();
+              fileReader.readAsDataURL( file );
+              fileReader.onloadend = function(evt) {
+                let voice = evt.target.result
+                if (voice) {
+                  resolve(voice)
+                }else{
+                  reject("err")
+                }
+              
+              }
+              });
+              
+          },function(e){
+              alert( "Resolve file URL failed: " + e.message );
+          })
+        })
+         
+      },
     getBase64Time(url){
-            console.log("调用此方法",url)
+            console.log("调用此方法",url)  //这里是能获取到的
             let that =this;
+            return new Promise((resolve,reject)=>{
             let canvas = document.createElement("canvas"),
             ctx = canvas.getContext("2d"),
             image = new Image();
             image.crossOrigin = "Anonymous";
             image.onload = function() {//这里是一个异步，所以获取到的base64文件需要用回调
-                canvas.height = image.height;
-                canvas.width = image.width;
-                ctx.drawImage(image, 0, 0);
-                ctx.font ="200px Arial";
-                ctx.fillStyle = "tomato"; 
-                let time = that.getCurrnetTime("timeSign");//获取当前的时间
-                 console.log("time",time)
-                ctx.textAlign = "end";
-                ctx.textBaseline = "middle";
-                ctx.fillText(time,image.width-20,image.height-100);
-                let dataURL = canvas.toDataURL( "image/png/jpg"); 
-                // console.log("dataURL",dataURL)
-                return dataURL
-                // that.takeImgsbase64.push(dataURL);
-                // that.$emit('update:takeImgsbase64', that.takeImgsbase64) //双向绑定还是要抛出？这是个疑问
-                // console.log("组件里的that.takeImgs",that.takeImgsbase64)
-            };
-            image.src = url
-        },
+                  console.log("enter1")
+                  canvas.height = image.height;
+                  canvas.width = image.width;
+                  ctx.drawImage(image, 0, 0);
+                  ctx.font ="200px Arial";
+                  ctx.fillStyle = "tomato"; 
+                  let time = that.getCurrnetTime("timeSign");//获取当前的时间
+                   console.log("time",time)
+                  ctx.textAlign = "end";
+                  ctx.textBaseline = "middle";
+                  ctx.fillText(time,image.width-20,image.height-100);
+                  let dataURL = canvas.toDataURL( "image/png/jpg"); 
+                  if(dataURL) {
+                    resolve(dataURL)
+                  }else{
+                    reject("err")
+                  }
+              };
+              image.src = url
+            })
+           
+    },
          //获取当前时间
         getCurrnetTime(flga){
             let now = new Date(),
@@ -358,7 +401,7 @@ export default {
         },
 
          base64TOfile(base64){
-           console.log("base64",base64)
+           console.log("base64")
           let that = this;
           var arr = base64.split(',');
           var mime = arr[0].match(/:(.*?);/)[1];
@@ -380,7 +423,7 @@ export default {
     // 新建一个巡查对象，然后返回ID，再依次添加数据
     submit(){
       
-      console.log("转化的base64",this.takeImgsbase64,this.takeImgsbase64.length)
+      console.log("转化的base64",this.takeImgsbase64.length,this.voicebase64)
       Toast.loading({
         duration: 0,
         mask: true,
@@ -403,7 +446,8 @@ export default {
       })
     },
     /* submit */
-    submitTrajectroy(){
+    async  submitTrajectroy(){
+      let result;
       let that = this;
       for (let index = 0; index < this.localList.length; index++) {
         let param = new FormData();
@@ -412,35 +456,52 @@ export default {
         param.append("ProblemStatus",this.localList[index].ProblemStatus)
         param.append("ProblemRemarkType",this.localList[index].ProblemRemarkType)
         param.append("ProblemRemark",this.localList[index].ProblemRemark)
-        param.append("RemarkVioce", this.localList[index].RemarkVioce)
-          if ( this.localList[index].RemarkVioce) {
-                 param.append("VoiceLength", this.localList[index].duration)
+        // param.append("RemarkVioce", this.localList[index].RemarkVioce)
+          if ( this.localList[index].RemarkVioceT) {
+                let voicefile = this.base64TOfile(this.voicebase64[index])
+                param.append("RemarkVioce", voicefile)
+                param.append("VoiceLength", this.localList[index].duration)
           }
           if (this.localList[index].photoListFile.length) {
+             console.log("提交图片提交图片提交图片2222",this.takeImgsbase64[index].file.length)
             for (let y = 0; y <  this.takeImgsbase64[index].file.length; y++) {
-              
+              console.log("提交图片提交图片提交图片1111")
               let fileImg = this.base64TOfile(this.takeImgsbase64[index].file[y])
               console.log("fileImg",fileImg)
               param.append(`LivePicture${Number(y) + 1}`, fileImg);
             }
            
           }
-      }
-
-       this.$axios.post(this.$api.AddPatrolTrackDetail,param).then(res => {
+          await  this.$axios.post(this.$api.AddPatrolTrackDetail,param).then(res => {
               console.log("添加巡查轨迹反馈",res)
-                  Toast.clear();
-                  that.$toast.success("提交成功");
-                  that.$router.push({
-                    name:'firePatrol'
-                  });
-                  localStorage.removeItem('patrolArray')
-                  this.$store.commit('setTrajectroyList',[])
+                  // Toast.clear();
+                  // that.$toast.success("提交成功");
+                  // that.$router.push({
+                  //   name:'firePatrol'
+                  // });
+                  // localStorage.removeItem('patrolArray')
+                  // this.$store.commit('setTrajectroyList',[])
+
+                  result = res.data.result.success
             }).catch(err=>{
               console.log("请求错误",err)
                Toast.clear();
                this.$toast('网络连接超时请稍后重试')
             })
+      }
+
+      console.log("result结果",result)
+      if (result) {
+        Toast.clear();
+        that.$toast.success("提交成功");
+        that.$router.push({
+          name:'firePatrol'
+        });
+        localStorage.removeItem('patrolArray')
+        this.$store.commit('setTrajectroyList',[])
+      }
+
+      
 
       }
 
