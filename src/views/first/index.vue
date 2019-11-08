@@ -97,6 +97,8 @@ export default {
     created(){
         console.log("this.$route.meta.active",this.$route.meta.active)
          this.active = this.$route.meta.active
+
+         /* this.dingwei() */
     },
     methods:{
         menuchange(state){
@@ -105,6 +107,14 @@ export default {
            }else{
                 this.active = true
            }
+
+        },
+        dingwei(){
+            plus.geolocation.getCurrentPosition(function(p){//成功回调
+                alert('当前位置信息：' + p.coords.latitude + '\nLongitude:' + p.coords.longitude + '\nAltitude:' +p.coords.altitude);
+            }, function(e){//失败回调
+                alert('Geolocation error: ' + e.message);
+            },{geocode:true});
 
         }
     }
